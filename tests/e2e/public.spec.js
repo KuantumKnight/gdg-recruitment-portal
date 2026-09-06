@@ -6,15 +6,17 @@ test.describe("public recruitment flow", () => {
     page.on("console", (message) => { if (message.type() === "error" && !message.text().includes("hydration-mismatch")) errors.push(message.text()); });
     await page.goto("/");
     await expect(page).toHaveTitle(/Recruitment 2026/i);
-    await page.getByRole("link", { name: /join us/i }).click();
+    await page.getByRole("link", { name: /explore teams/i }).click();
     await expect(page).toHaveURL(/\/departments$/);
     expect(errors).toEqual([]);
   });
 
-  test("departments expose selectable team cards", async ({ page }) => {
+  test("departments reflect the closed recruitment state", async ({ page }) => {
     await page.goto("/departments");
     await expect(page.getByRole("heading", { name: "Technical Departments", exact: true })).toBeVisible();
+    await expect(page.getByText(/This recruitment round has closed/i)).toBeVisible();
     await expect(page.getByLabel(/Select/).first()).toBeVisible();
+    await expect(page.getByLabel(/Select/).first()).toBeDisabled();
     await page.goto("/join/c21ca066-ab4d-40a3-943c-f170d6312bdc");
     await expect(page).toHaveURL(/\/join\/[^/]+$/);
   });
