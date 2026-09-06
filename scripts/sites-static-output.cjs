@@ -24,6 +24,8 @@ const routes = [
   ["departments.html", "departments/index.html"],
   ["auth/signin.html", "auth/signin/index.html"],
   ["auth/signout.html", "auth/signout/index.html"],
+  ["auth/forgot-password.html", "auth/forgot-password/index.html"],
+  ["auth/reset-password.html", "auth/reset-password/index.html"],
   ["_not-found.html", "404.html"],
 ];
 for (const [source, destination] of routes) {

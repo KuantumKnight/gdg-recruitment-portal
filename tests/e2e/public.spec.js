@@ -27,6 +27,16 @@ test.describe("public recruitment flow", () => {
     await expect(page).toHaveURL(/callbackURL=%2Fjoin%2Fweb-dev/);
   });
 
+  test("password recovery is discoverable and rejects missing reset tokens", async ({ page }) => {
+    await page.goto("/auth/signin");
+    await page.getByRole("link", { name: /forgot password/i }).click();
+    await expect(page).toHaveURL(/\/auth\/forgot-password$/);
+    await expect(page.getByRole("heading", { name: /Reset your password/i })).toBeVisible();
+    await page.goto("/auth/reset-password");
+    await expect(page.getByText(/missing, invalid, or expired/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: /Request a new link/i })).toBeVisible();
+  });
+
   test("mobile navigation opens and the page has no horizontal overflow", async ({ page }) => {
     await page.goto("/");
     if ((page.viewportSize()?.width ?? 0) > 768) {

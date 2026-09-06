@@ -115,23 +115,11 @@ export default function SignInPage() {
                 Open the verification link sent to <strong className="font-medium text-[#f3f1e9]">{verificationEmail}</strong>. You must verify that institutional address before a session can be created.
               </p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={resendVerification}
-                  disabled={resending}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#d7fa70] px-5 text-sm font-bold text-[#101110] disabled:cursor-not-allowed disabled:opacity-60"
-                >
+                <button type="button" onClick={resendVerification} disabled={resending} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#d7fa70] px-5 text-sm font-bold text-[#101110] disabled:cursor-not-allowed disabled:opacity-60">
                   <RefreshCw size={15} aria-hidden="true" />
                   {resending ? "Sending…" : "Resend link"}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVerificationEmail("");
-                    setPassword("");
-                  }}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-[#30332c] px-5 text-sm font-semibold text-[#f3f1e9] hover:bg-white/5"
-                >
+                <button type="button" onClick={() => { setVerificationEmail(""); setPassword(""); }} className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-[#30332c] px-5 text-sm font-semibold text-[#f3f1e9] hover:bg-white/5">
                   <ArrowLeft size={15} aria-hidden="true" />
                   Use another email
                 </button>
@@ -148,14 +136,7 @@ export default function SignInPage() {
 
               <div className="my-8 grid grid-cols-2 rounded-full border border-[#30332c] p-1" role="tablist" aria-label="Account access">
                 {[["signin", "Sign in"], ["signup", "Create account"]].map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    role="tab"
-                    aria-selected={mode === value}
-                    onClick={() => setMode(value)}
-                    className={`rounded-full px-3 py-2.5 text-sm ${mode === value ? "bg-[#d7fa70] font-bold text-[#101110]" : "text-[#a7aa9e] hover:text-[#f3f1e9]"}`}
-                  >
+                  <button key={value} type="button" role="tab" aria-selected={mode === value} onClick={() => setMode(value)} className={`rounded-full px-3 py-2.5 text-sm ${mode === value ? "bg-[#d7fa70] font-bold text-[#101110]" : "text-[#a7aa9e] hover:text-[#f3f1e9]"}`}>
                     {label}
                   </button>
                 ))}
@@ -173,8 +154,11 @@ export default function SignInPage() {
                   <input id="email" type="email" className="h-12 rounded-xl border border-[#30332c] bg-[#101110] px-4 outline-none focus:border-[#d7fa70]" placeholder="you@vitstudent.ac.in" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" />
                 </div>
                 <div className="grid gap-2">
-                  <label htmlFor="password" className="text-sm font-medium">Password</label>
-                  <input id="password" type="password" className="h-12 rounded-xl border border-[#30332c] bg-[#101110] px-4 outline-none focus:border-[#d7fa70]" placeholder="At least 8 characters" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="password" className="text-sm font-medium">Password</label>
+                    {mode === "signin" && <a href="/auth/forgot-password" className="text-xs font-medium text-[#d7fa70] hover:underline">Forgot password?</a>}
+                  </div>
+                  <input id="password" type="password" className="h-12 rounded-xl border border-[#30332c] bg-[#101110] px-4 outline-none focus:border-[#d7fa70]" placeholder="At least 8 characters" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} maxLength={128} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
                 </div>
                 <button type="submit" disabled={submitting} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#d7fa70] px-5 text-sm font-bold text-[#101110] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60">
                   {submitting ? "Processing…" : mode === "signin" ? "Sign in" : "Create account"}
