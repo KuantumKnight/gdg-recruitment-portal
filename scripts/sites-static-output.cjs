@@ -22,7 +22,6 @@ fs.mkdirSync(out, { recursive: true });
 const routes = [
   ["index.html", "index.html"],
   ["departments.html", "departments/index.html"],
-  ["development.html", "development/index.html"],
   ["auth/signin.html", "auth/signin/index.html"],
   ["auth/signout.html", "auth/signout/index.html"],
   ["_not-found.html", "404.html"],
