@@ -2,6 +2,7 @@
 
 import React from "react";
 import { authClient } from "@/lib/auth-client";
+import { safeCallbackURL } from "@/lib/auth-redirect";
 import { Button } from "./ui/button";
 import { FaGoogle } from "react-icons/fa";
 
@@ -10,7 +11,7 @@ export default function SignInButton({ children, callbackURL = "/" }) {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/"
+        callbackURL: safeCallbackURL(callbackURL)
       });
     } catch (error) {
       console.error("Sign in error:", error);
