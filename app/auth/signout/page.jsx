@@ -1,32 +1,44 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import GDGLoader from "@/components/GDGLoader";
 
 export default function SignOutPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const performSignOut = async () => {
+    let active = true;
+
+    async function performSignOut() {
       try {
-        await authClient.signOut();
-        toast.success("Signed out successfully");
-        router.push("/");
+        const result = await authClient.signOut();
+        if (result?.error) throw new Error(result.error.message || "Sign out failed");
+        if (!active) return;
+        toast.success("Signed out successfully.");
       } catch (error) {
         console.error("Sign out error:", error);
-        toast.error("Failed to sign out");
-        router.push("/");
+        if (!active) return;
+        toast.error("We could not confirm sign out. Please try again if your session remains active.");
+      } finally {
+        if (active) {
+          router.replace("/");
+          router.refresh();
+        }
       }
-    };
+    }
 
     performSignOut();
+    return () => {
+      active = false;
+    };
   }, [router]);
 
   return (
-    <div>
-      <p>Signing out...</p>
-    </div>
+    <main className="min-h-screen bg-[#f8f9fa]">
+      <GDGLoader label="Signing you out…" />
+    </main>
   );
-} 
+}

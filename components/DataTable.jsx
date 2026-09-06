@@ -24,7 +24,7 @@ import FilterDepartment from "./FilterDepartment";
 import FilterShortlisted from "./FilterShortlisted";
 
 const fieldClass =
-  "h-11 w-full rounded-lg border border-[#30332c] bg-[#181a16] px-3 text-sm text-[#f3f1e9] focus:outline-none focus:ring-2 focus:ring-[#d7fa70]";
+  "h-11 w-full rounded-xl border border-[#dadce0] bg-white px-3 text-sm text-[#202124] focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]";
 
 export default function DataTable({ data, setData, hasMore }) {
   const [query, setQuery] = useState("");
@@ -37,6 +37,7 @@ export default function DataTable({ data, setData, hasMore }) {
   const [pending, setPending] = useState(new Set());
   const pendingRef = useRef(new Set());
   const [reviewId, setReviewId] = useState(null);
+
   const departments = useMemo(
     () =>
       [...new Set(data.map((item) => item.Department).filter(Boolean))].sort(
@@ -44,6 +45,7 @@ export default function DataTable({ data, setData, hasMore }) {
       ),
     [data],
   );
+
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
     return data
@@ -81,6 +83,7 @@ export default function DataTable({ data, setData, hasMore }) {
           ) * sort.direction,
       );
   }, [data, query, department, status, sort]);
+
   const pageCount = Math.ceil(filtered.length / pageSize);
   const currentPage = Math.min(pageIndex, Math.max(0, pageCount - 1));
   const page = filtered.slice(
@@ -98,6 +101,7 @@ export default function DataTable({ data, setData, hasMore }) {
     setter(value);
     setPageIndex(0);
   }
+
   function toggleSelected(id) {
     setSelected((previous) => {
       const next = new Set(previous);
@@ -105,6 +109,7 @@ export default function DataTable({ data, setData, hasMore }) {
       return next;
     });
   }
+
   function togglePage() {
     setSelected((previous) => {
       const next = new Set(previous);
@@ -116,6 +121,7 @@ export default function DataTable({ data, setData, hasMore }) {
       return next;
     });
   }
+
   async function handleShortlist(applicant) {
     const id = applicantId(applicant);
     if (pendingRef.current.has(id)) return;
@@ -128,12 +134,13 @@ export default function DataTable({ data, setData, hasMore }) {
         body: JSON.stringify({ shortlisted: !applicant.shortlisted }),
       });
       const result = await response.json();
-      if (!response.ok)
+      if (!response.ok) {
         throw new Error(
           result.message ||
             result.error ||
             "Could not update status. Please try again.",
         );
+      }
       setData((previous) =>
         previous.map((item) =>
           applicantId(item) === id
@@ -153,6 +160,7 @@ export default function DataTable({ data, setData, hasMore }) {
       setPending(new Set(pendingRef.current));
     }
   }
+
   function exportCsv() {
     const records = selectedApplicants.length ? selectedApplicants : filtered;
     const url = URL.createObjectURL(
@@ -166,14 +174,13 @@ export default function DataTable({ data, setData, hasMore }) {
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+
   async function sendMail(payloadData) {
     const response = await fetch("/api/send-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        recipients: selectedApplicants.map((item) => ({
-          id: applicantId(item),
-        })),
+        recipients: selectedApplicants.map((item) => ({ id: applicantId(item) })),
         payloadData,
       }),
     });
@@ -182,10 +189,14 @@ export default function DataTable({ data, setData, hasMore }) {
       const progress = Array.isArray(result.acceptedIds)
         ? `${result.acceptedIds.length} accepted, ${result.unattemptedIds?.length || 0} not attempted. `
         : "";
-      throw new Error(progress + (result.message || result.error || "Email could not be sent."));
+      throw new Error(
+        progress +
+          (result.message || result.error || "Email could not be sent."),
+      );
     }
     toast.success(result.message || "Email sent successfully.");
   }
+
   const stats = [
     { label: "Applications loaded", value: data.length, Icon: Users },
     {
@@ -193,37 +204,33 @@ export default function DataTable({ data, setData, hasMore }) {
       value: data.filter((item) => item.shortlisted).length,
       Icon: CheckCircle2,
     },
-    {
-      label: "Matching your filters",
-      value: filtered.length,
-      Icon: ListFilter,
-    },
+    { label: "Matching your filters", value: filtered.length, Icon: ListFilter },
   ];
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map(({ label, value, Icon }) => (
-          <div
-            key={label}
-            className="panel flex items-start justify-between p-6"
-          >
+          <div key={label} className="panel flex items-start justify-between p-6">
             <div>
-              <p className="text-xs text-[#a7aa9e]">{label}</p>
-              <p className="mt-3 text-4xl font-semibold tracking-tight">
+              <p className="text-xs text-[#5f6368]">{label}</p>
+              <p className="mt-3 text-4xl font-medium tracking-tight text-[#202124]">
                 {value.toString().padStart(2, "0")}
               </p>
             </div>
-            <Icon size={20} className="text-[#d7fa70]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8f0fe] text-[#1a73e8]">
+              <Icon size={19} />
+            </div>
           </div>
         ))}
       </div>
+
       <div className="panel overflow-hidden">
-        <div className="border-b border-[#30332c] p-5 sm:p-6">
+        <div className="border-b border-[#e8eaed] p-5 sm:p-6">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold">Application inbox</h2>
-              <p className="mt-1 text-xs text-[#a7aa9e]">
+              <h2 className="text-lg font-semibold text-[#202124]">Application inbox</h2>
+              <p className="mt-1 text-xs text-[#5f6368]">
                 {hasMore
                   ? "More records available below. Search and export cover loaded records."
                   : "Review responses, shortlist candidates, and keep your team moving."}
@@ -234,17 +241,14 @@ export default function DataTable({ data, setData, hasMore }) {
               className="button-secondary"
               onClick={exportCsv}
             >
-              <Download size={15} /> Export{" "}
-              {selectedApplicants.length ? "selected" : "filtered"}
+              <Download size={15} /> Export {selectedApplicants.length ? "selected" : "filtered"}
             </button>
           </div>
+
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
             <label className="relative">
               <span className="sr-only">Search applications</span>
-              <Search
-                className="absolute left-3 top-3.5 text-[#a7aa9e]"
-                size={16}
-              />
+              <Search className="absolute left-3 top-3.5 text-[#80868b]" size={16} />
               <input
                 value={query}
                 onChange={(event) => updateFilter(setQuery, event.target.value)}
@@ -275,45 +279,41 @@ export default function DataTable({ data, setData, hasMore }) {
             </button>
           </div>
         </div>
+
         {selectedApplicants.length > 0 && (
-          <div className="flex flex-wrap items-center gap-3 border-b border-[#30332c] bg-[#d7fa70]/5 px-6 py-3">
-            <span className="mr-auto text-sm">
+          <div className="flex flex-wrap items-center gap-3 border-b border-[#d2e3fc] bg-[#e8f0fe] px-6 py-3 text-[#174ea6]">
+            <span className="mr-auto text-sm font-medium">
               {selectedApplicants.length} selected across loaded records
             </span>
-            <MailComposer
-              recipients={selectedApplicants}
-              handleRowSelection={sendMail}
-            />
-            <button
-              className="button-secondary"
-              onClick={() => setSelected(new Set())}
-            >
+            <MailComposer recipients={selectedApplicants} handleRowSelection={sendMail} />
+            <button className="button-secondary" onClick={() => setSelected(new Set())}>
               <X size={14} /> Clear selection
             </button>
           </div>
         )}
+
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[780px] text-left text-sm">
+          <table className="w-full min-w-[780px] text-left text-sm text-[#202124]">
             <caption className="sr-only">
-              GDG recruitment applications. Use the name button to review
-              responses.
+              GDG recruitment applications. Use the name button to review responses.
             </caption>
-            <thead className="bg-[#181a16] text-xs text-[#a7aa9e]">
+            <thead className="bg-[#f8f9fa] text-xs font-medium text-[#5f6368]">
               <tr>
                 <th scope="col" className="w-12 p-4">
                   <input
                     type="checkbox"
                     aria-label="Select all applications on this page"
                     ref={(element) => {
-                      if (element)
+                      if (element) {
                         element.indeterminate =
                           !allPageSelected &&
                           page.some((item) => selected.has(applicantId(item)));
+                      }
                     }}
                     checked={allPageSelected}
                     disabled={!page.length}
                     onChange={togglePage}
-                    className="h-4 w-4 accent-[#d7fa70]"
+                    className="h-4 w-4 accent-[#1a73e8]"
                   />
                 </th>
                 {[
@@ -334,7 +334,7 @@ export default function DataTable({ data, setData, hasMore }) {
                     className="px-4 py-4"
                   >
                     <button
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 hover:text-[#1a73e8]"
                       onClick={() => {
                         setSort({
                           key,
@@ -353,9 +353,7 @@ export default function DataTable({ data, setData, hasMore }) {
                     </button>
                   </th>
                 ))}
-                <th scope="col" className="px-4 py-4">
-                  Status
-                </th>
+                <th scope="col" className="px-4 py-4">Status</th>
                 <th scope="col" className="px-4 py-4">
                   <span className="sr-only">Review application</span>
                 </th>
@@ -367,7 +365,7 @@ export default function DataTable({ data, setData, hasMore }) {
                 return (
                   <tr
                     key={id}
-                    className="border-t border-[#30332c] transition-colors hover:bg-white/[0.025]"
+                    className="border-t border-[#e8eaed] transition-colors hover:bg-[#f8f9fa]"
                   >
                     <td className="p-4">
                       <input
@@ -375,36 +373,32 @@ export default function DataTable({ data, setData, hasMore }) {
                         aria-label={`Select ${applicant.Name}`}
                         checked={selected.has(id)}
                         onChange={() => toggleSelected(id)}
-                        className="h-4 w-4 accent-[#d7fa70]"
+                        className="h-4 w-4 accent-[#1a73e8]"
                       />
                     </td>
                     <td className="px-4 py-5">
                       <button
-                        className="text-left font-medium hover:text-[#d7fa70]"
+                        className="text-left font-medium text-[#202124] hover:text-[#1a73e8]"
                         onClick={() => setReviewId(id)}
                       >
                         {applicant.Name || "Unnamed applicant"}
                       </button>
-                      <p className="mt-1 text-xs text-[#a7aa9e]">
-                        {applicant.Email}
-                      </p>
-                      <p className="mt-1 text-xs text-[#a7aa9e]">
-                        {applicant.RegistrationNumber}
-                      </p>
+                      <p className="mt-1 text-xs text-[#5f6368]">{applicant.Email}</p>
+                      <p className="mt-1 text-xs text-[#80868b]">{applicant.RegistrationNumber}</p>
                     </td>
-                    <td className="px-4 py-5">
-                      {departmentLabel(applicant.Department)}
-                    </td>
-                    <td className="px-4 py-5 text-[#a7aa9e]">
-                      {applicant.Pref || "—"}
-                    </td>
+                    <td className="px-4 py-5">{departmentLabel(applicant.Department)}</td>
+                    <td className="px-4 py-5 text-[#5f6368]">{applicant.Pref || "—"}</td>
                     <td className="px-4 py-5">
                       <button
                         aria-pressed={Boolean(applicant.shortlisted)}
                         aria-label={`${applicant.shortlisted ? "Remove" : "Add"} ${applicant.Name} ${applicant.shortlisted ? "from" : "to"} shortlist`}
                         disabled={pending.has(id)}
                         onClick={() => handleShortlist(applicant)}
-                        className={`rounded-full border px-3 py-2 text-xs ${applicant.shortlisted ? "border-[#d7fa70]/30 bg-[#d7fa70]/10 text-[#d7fa70]" : "border-[#41463a] text-[#c4c7bb]"}`}
+                        className={`rounded-full border px-3 py-2 text-xs font-medium ${
+                          applicant.shortlisted
+                            ? "border-[#a8dab5] bg-[#e6f4ea] text-[#137333]"
+                            : "border-[#dadce0] bg-white text-[#5f6368]"
+                        }`}
                       >
                         {pending.has(id)
                           ? "Saving…"
@@ -416,7 +410,7 @@ export default function DataTable({ data, setData, hasMore }) {
                     <td className="px-4 py-5">
                       <button
                         onClick={() => setReviewId(id)}
-                        className="text-xs text-[#d7fa70] hover:underline"
+                        className="text-xs font-medium text-[#1a73e8] hover:underline"
                         aria-label={`Review ${applicant.Name}'s responses`}
                       >
                         Review ↗
@@ -428,23 +422,23 @@ export default function DataTable({ data, setData, hasMore }) {
             </tbody>
           </table>
         </div>
+
         {!filtered.length && (
           <div className="px-6 py-16 text-center">
-            <Users className="mx-auto mb-4 text-[#717867]" size={30} />
-            <h3 className="font-medium">
-              {data.length
-                ? "No matching applications"
-                : "A new team starts here"}
+            <Users className="mx-auto mb-4 text-[#9aa0a6]" size={30} />
+            <h3 className="font-medium text-[#202124]">
+              {data.length ? "No matching applications" : "A new team starts here"}
             </h3>
-            <p className="mt-2 text-sm text-[#a7aa9e]">
+            <p className="mt-2 text-sm text-[#5f6368]">
               {data.length
                 ? "Try another search or reset your filters."
                 : "Applications will appear here once students submit their responses."}
             </p>
           </div>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#30332c] p-4">
-          <label className="flex items-center gap-2 text-xs text-[#a7aa9e]">
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#e8eaed] p-4">
+          <label className="flex items-center gap-2 text-xs text-[#5f6368]">
             Rows per page
             <select
               value={pageSize}
@@ -452,7 +446,7 @@ export default function DataTable({ data, setData, hasMore }) {
                 setPageSize(Number(event.target.value));
                 setPageIndex(0);
               }}
-              className="rounded-md border border-[#30332c] bg-[#181a16] p-2"
+              className="rounded-lg border border-[#dadce0] bg-white p-2 text-[#202124] focus:border-[#1a73e8] focus:outline-none"
             >
               {[10, 25, 50].map((size) => (
                 <option key={size}>{size}</option>
@@ -469,6 +463,7 @@ export default function DataTable({ data, setData, hasMore }) {
           />
         </div>
       </div>
+
       <DialogComp
         applicant={reviewed}
         open={Boolean(reviewed)}
@@ -481,5 +476,3 @@ export default function DataTable({ data, setData, hasMore }) {
     </div>
   );
 }
-
-

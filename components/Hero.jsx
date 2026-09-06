@@ -1,51 +1,69 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays, FolderOpen, Users, Waypoints } from "lucide-react";
+import { ArrowRight, BookOpen, Code2, Layers3, Users } from "lucide-react";
+import { isRecruitmentOpen } from "@/lib/recruitment";
 
-const highlights = [
-  { label: "A Google Initiative", tone: "yellow", icon: FolderOpen },
-  { label: "12 Teams, Real Projects, Endless Chaos", tone: "green", icon: CalendarDays },
-  { label: "200+ Passionate Developers", tone: "blue", icon: Users },
-  { label: "Opportunities to Lead and Innovate", tone: "red", icon: Waypoints },
+const principles = [
+  { title: "Build real things", text: "Work on practical projects with people who care about the outcome.", Icon: Code2, color: "#4285F4" },
+  { title: "Learn together", text: "Ask better questions, share progress, and grow through collaboration.", Icon: BookOpen, color: "#34A853" },
+  { title: "Find your team", text: "Choose the domain where your curiosity and skills have momentum.", Icon: Users, color: "#EA4335" },
+  { title: "Ship responsibly", text: "Own the details, iterate on feedback, and build work you can explain.", Icon: Layers3, color: "#FBBC04" },
 ];
 
-function Highlight({ item, desktop = false }) {
-  const Icon = item.icon;
-  return (
-    <div className={`gdg-pill gdg-pill-${item.tone} ${desktop ? "hidden lg:block" : "px-4 py-3"}`}>
-      <div className="flex items-center gap-2">
-        {!desktop && <Icon className="h-4 w-4 shrink-0 text-white" aria-hidden="true" />}
-        <span className={desktop ? "px-6 py-4" : "text-sm"}>{item.label}</span>
-      </div>
-    </div>
-  );
-}
-
 export default function Hero() {
+  const open = isRecruitmentOpen();
+
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#121212]">
-      <div className="gdg-hero-grid absolute inset-0 h-1/2 opacity-30" aria-hidden="true" />
-      <div className="gdg-hero-ellipse absolute inset-x-0 top-1/2 -translate-y-1/2" aria-hidden="true" />
-
-      <div className="relative z-10 flex min-h-[calc(100vh-120px)] flex-col items-center justify-center px-4 py-12">
-        <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
-          <div className="absolute left-20 top-20 rotate-[-12deg]"><Highlight item={highlights[0]} desktop /></div>
-          <div className="absolute right-20 top-32 rotate-[12deg]"><Highlight item={highlights[1]} desktop /></div>
-          <div className="absolute bottom-32 left-32 rotate-[6deg]"><Highlight item={highlights[2]} desktop /></div>
-          <div className="absolute bottom-20 right-32 rotate-[-6deg]"><Highlight item={highlights[3]} desktop /></div>
-        </div>
-
-        <div className="mt-4 flex max-w-3xl flex-wrap justify-center gap-4 lg:hidden">
-          {highlights.map((item) => <Highlight item={item} key={item.label} />)}
-        </div>
-
-        <div className="mx-auto mt-10 max-w-3xl space-y-6 text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[.24em] text-blue-300">Google Developer Groups on Campus VIT Chennai</p>
-          <h1 className="leading-none text-white" style={{ fontWeight: 800, fontSize: "clamp(32px, 8vw, 55px)" }}>Ready to Make Your Mark?</h1>
-          <p className="mx-auto max-w-2xl text-gray-300" style={{ fontWeight: 300, fontSize: "clamp(18px, 4vw, 30px)", lineHeight: 1 }}>Innovate with us — your journey starts here.</p>
-          <div className="flex justify-center gap-x-5">
-            <Link href="/departments" className="mt-8 inline-flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3 text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-blue-700 sm:px-12 sm:py-4 sm:text-xl">Join us <ArrowRight size={19} /></Link>
-            <a href="https://docs.google.com/document/d/1nkCCHtfCWqLvFjlYgb5EmNG9xmhrsuUEDxEluKtO_Ug/edit?usp=sharing" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-red-500 px-8 py-3 text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-red-700 sm:px-12 sm:py-4 sm:text-xl">FAQs <ArrowRight size={19} /></a>
+    <section className="bg-white">
+      <div className="page-shell py-16 sm:py-24 lg:py-28">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto flex w-fit items-center gap-1.5" aria-hidden="true">
+            <span className="h-1.5 w-8 rounded-full bg-[#4285f4]" />
+            <span className="h-1.5 w-8 rounded-full bg-[#ea4335]" />
+            <span className="h-1.5 w-8 rounded-full bg-[#fbbc04]" />
+            <span className="h-1.5 w-8 rounded-full bg-[#34a853]" />
           </div>
+
+          <p className="mt-8 text-sm font-medium text-[#0b57d0]">
+            Google Developer Groups on Campus · VIT Chennai
+          </p>
+          <h1 className="mx-auto mt-4 max-w-4xl text-[clamp(3rem,8vw,6.2rem)] font-normal leading-[.96] tracking-[-.05em] text-[#202124]">
+            Build what matters.
+            <span className="block text-[#5f6368]">Learn with people who do.</span>
+          </h1>
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-[#5f6368] sm:text-lg sm:leading-8">
+            Explore the teams behind GDG on Campus VIT Chennai, understand what each one works on, and choose where you want to contribute.
+          </p>
+
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/departments" className="button-primary px-6">
+              Explore teams <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+            <a
+              href="https://docs.google.com/document/d/1nkCCHtfCWqLvFjlYgb5EmNG9xmhrsuUEDxEluKtO_Ug/edit?usp=sharing"
+              target="_blank"
+              rel="noreferrer"
+              className="button-secondary px-6"
+            >
+              Recruitment FAQs
+            </a>
+          </div>
+
+          <div className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#f1f3f4] px-4 py-2 text-sm text-[#5f6368]">
+            <span className={`h-2 w-2 rounded-full ${open ? "bg-[#34a853]" : "bg-[#80868b]"}`} aria-hidden="true" />
+            {open ? "Applications are open" : "Recruitment is currently closed"}
+          </div>
+        </div>
+
+        <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {principles.map(({ title, text, Icon, color }) => (
+            <article key={title} className="rounded-[18px] border border-[#dadce0] bg-white p-6 transition-shadow hover:shadow-[0_1px_2px_rgba(60,64,67,.08),0_2px_8px_rgba(60,64,67,.08)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ backgroundColor: `${color}14`, color }}>
+                <Icon size={19} aria-hidden="true" />
+              </div>
+              <h2 className="mt-5 text-[15px] font-semibold text-[#202124]">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-[#5f6368]">{text}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>

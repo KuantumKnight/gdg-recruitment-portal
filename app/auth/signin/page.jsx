@@ -1,62 +1,119 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, LockKeyhole } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { INSTITUTIONAL_DOMAIN } from "@/lib/auth-policy";
 import { safeCallbackURL } from "@/lib/auth-redirect";
-import { toast } from "sonner";
 import GDGLoader from "@/components/GDGLoader";
+
+function authErrorMessage(value) {
+  const code = String(value || "").toLowerCase();
+  if (!code) return "";
+  if (code.includes("email_not_allowed") || code.includes("google_only")) {
+    return `Use your @${INSTITUTIONAL_DOMAIN} Google account.`;
+  }
+  if (code.includes("email_not_verified")) {
+    return "Google could not verify the email address on this account.";
+  }
+  if (code.includes("access_denied")) {
+    return "Google sign-in was cancelled.";
+  }
+  return "Google sign-in could not be completed. Please try again.";
+}
 
 export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackURL = useMemo(() => safeCallbackURL(searchParams.get("callbackURL")), [searchParams]);
+  const callbackURL = useMemo(
+    () => safeCallbackURL(searchParams.get("callbackURL")),
+    [searchParams],
+  );
   const { data: session, isPending } = authClient.useSession();
-  const [mode, setMode] = useState("signin");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [clientError, setClientError] = useState("");
+  const oauthError = authErrorMessage(searchParams.get("error"));
 
   useEffect(() => {
     if (session?.user && !isPending) router.replace(callbackURL);
   }, [callbackURL, isPending, router, session]);
 
-  if (isPending) return <GDGLoader />;
-  if (session?.user) return <div className="flex min-h-screen items-center justify-center bg-[#101110] text-[#a7aa9e]"><p className="text-sm">Redirecting...</p></div>;
+  if (isPending) return <GDGLoader label="Checking your Google session…" />;
+  if (session?.user) return <GDGLoader label="Redirecting…" />;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!email || !password) return toast.error("Please fill in all required fields.");
-    if (mode === "signup" && !name) return toast.error("Please enter your name.");
+  async function continueWithGoogle() {
+    if (submitting) return;
     setSubmitting(true);
+    setClientError("");
     try {
-      const result = mode === "signup"
-        ? await authClient.signUp.email({ email, password, name, callbackURL })
-        : await authClient.signIn.email({ email, password, callbackURL });
-      if (result?.error) toast.error(result.error.message || "Authentication failed.");
-      else { toast.success(mode === "signup" ? "Account created successfully!" : "Signed in successfully!"); router.replace(callbackURL); }
-    } catch (error) {
-      console.error("Auth error:", error);
-      toast.error("Authentication failed. Please check your credentials.");
-    } finally { setSubmitting(false); }
-  };
+      const errorCallbackURL = `/auth/signin?callbackURL=${encodeURIComponent(callbackURL)}`;
+      const result = await authClient.signIn.social({
+        provider: "google",
+        callbackURL,
+        newUserCallbackURL: callbackURL,
+        errorCallbackURL,
+        additionalParams: { hd: INSTITUTIONAL_DOMAIN },
+      });
+      if (result?.error) {
+        setClientError(authErrorMessage(result.error.code || result.error.message));
+        setSubmitting(false);
+      }
+    } catch {
+      setClientError("Google sign-in could not be started. Please try again.");
+      setSubmitting(false);
+    }
+  }
 
   return (
-    <main className="min-h-screen bg-[#101110] px-5 py-10 text-[#f3f1e9] sm:py-16">
-      <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[28px] border border-[#30332c] bg-[#171914] shadow-2xl lg:grid-cols-[.9fr_1.1fr]">
-        <section className="hidden bg-[#d7fa70] p-10 text-[#101110] lg:flex lg:flex-col lg:justify-between"><div><p className="text-xs font-bold uppercase tracking-[.2em]">GDG on Campus · Recruitment 2026</p><h1 className="mt-20 text-6xl font-semibold leading-[.92] tracking-[-.07em]">Good things start with curious minds.</h1></div><p className="max-w-xs text-sm leading-6">Your account keeps your application safe, saves your progress, and lets you return to the teams you chose.</p></section>
-        <section className="p-6 sm:p-10"><p className="text-xs font-bold uppercase tracking-[.2em] text-[#d7fa70]">Candidate portal</p><h2 className="mt-3 text-4xl font-semibold tracking-[-.06em]">{mode === "signin" ? "Welcome back." : "Start your story."}</h2><p className="mt-3 text-sm leading-6 text-[#a7aa9e]">{mode === "signin" ? "Sign in to continue your application." : "Create an account to apply to up to two departments."}</p>
-          <div className="my-8 grid grid-cols-2 rounded-full border border-[#30332c] p-1" role="tablist" aria-label="Account access">{[["signin", "Sign in"], ["signup", "Create account"]].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={mode === value} onClick={() => setMode(value)} className={`rounded-full px-3 py-2.5 text-sm ${mode === value ? "bg-[#d7fa70] font-bold text-[#101110]" : "text-[#a7aa9e] hover:text-[#f3f1e9]"}`}>{label}</button>)}</div>
-          <form onSubmit={handleSubmit} className="grid gap-5">
-            {mode === "signup" && <div className="grid gap-2"><label htmlFor="name" className="text-sm font-medium">Full name</label><input id="name" type="text" className="h-12 rounded-xl border border-[#30332c] bg-[#101110] px-4 outline-none focus:border-[#d7fa70]" placeholder="Your full name" value={name} onChange={(event) => setName(event.target.value)} required /></div>}
-            <div className="grid gap-2"><label htmlFor="email" className="text-sm font-medium">Email address</label><input id="email" type="email" className="h-12 rounded-xl border border-[#30332c] bg-[#101110] px-4 outline-none focus:border-[#d7fa70]" placeholder="you@vitstudent.ac.in" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" /></div>
-            <div className="grid gap-2"><label htmlFor="password" className="text-sm font-medium">Password</label><input id="password" type="password" className="h-12 rounded-xl border border-[#30332c] bg-[#101110] px-4 outline-none focus:border-[#d7fa70]" placeholder="At least 8 characters" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
-            <button type="submit" disabled={submitting} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#d7fa70] px-5 text-sm font-bold text-[#101110] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60">{submitting ? "Processing..." : mode === "signin" ? "Sign in" : "Create account"}{!submitting && <ArrowUpRight size={16} />}</button>
-          </form><p className="mt-8 flex items-center gap-2 text-xs leading-5 text-[#70766b]"><ShieldCheck size={14} className="shrink-0 text-[#d7fa70]" /> Your account email is used as the identity for your applications.</p>
-        </section>
-      </div>
+    <main className="grid min-h-screen place-items-center bg-[#f8fafd] px-5 py-10 text-[#1f1f1f]">
+      <section className="w-full max-w-[448px] rounded-[28px] border border-[#dadce0] bg-white px-6 py-8 shadow-[0_1px_2px_rgba(60,64,67,.08),0_2px_8px_rgba(60,64,67,.06)] sm:px-10 sm:py-10">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#e0e3e7] bg-white shadow-sm">
+          <Image src="/assets/google-g.svg" alt="Google" width={24} height={24} priority />
+        </div>
+
+        <h1 className="mt-8 text-[32px] font-normal leading-tight tracking-[-.025em] text-[#202124]">
+          Sign in
+        </h1>
+        <p className="mt-2 text-[15px] leading-6 text-[#5f6368]">
+          Use your VIT student Google account to continue to the GDG recruitment portal.
+        </p>
+
+        <div className="mt-6 inline-flex rounded-full bg-[#e8f0fe] px-3 py-1.5 text-xs font-medium text-[#174ea6]">
+          Only @{INSTITUTIONAL_DOMAIN}
+        </div>
+
+        {(clientError || oauthError) && (
+          <div className="mt-6 rounded-xl border border-[#f6aea9] bg-[#fce8e6] px-4 py-3 text-sm leading-5 text-[#a50e0e]" role="alert">
+            {clientError || oauthError}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={continueWithGoogle}
+          disabled={submitting}
+          className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[#747775] bg-white px-5 text-sm font-medium text-[#1f1f1f] transition-[background-color,box-shadow] hover:bg-[#f8fafd] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b57d0] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <Image src="/assets/google-g.svg" alt="" width={18} height={18} aria-hidden="true" />
+          {submitting ? "Opening Google…" : "Continue with Google"}
+        </button>
+
+        <p className="mt-6 text-xs leading-5 text-[#80868b]">
+          Personal Gmail accounts, faculty accounts, and other domains are rejected by the server even if the browser request is modified.
+        </p>
+
+        <div className="mt-8 flex items-center justify-between gap-4 border-t border-[#e8eaed] pt-6">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[#0b57d0] hover:underline">
+            <ArrowLeft size={15} aria-hidden="true" /> Back
+          </Link>
+          <span className="inline-flex items-center gap-1.5 text-xs text-[#80868b]">
+            <LockKeyhole size={13} aria-hidden="true" /> Google OAuth
+          </span>
+        </div>
+      </section>
     </main>
   );
 }

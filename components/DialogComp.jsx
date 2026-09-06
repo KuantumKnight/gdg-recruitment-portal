@@ -17,61 +17,61 @@ export default function DialogComp({
   pending,
 }) {
   const questions = applicantQuestions(applicant);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[#30332c] bg-[#181a16] text-[#f3f1e9] sm:max-w-2xl">
+      <DialogContent className="border-[#dadce0] bg-white text-[#202124] shadow-xl sm:max-w-2xl">
         <DialogHeader>
-          <p className="eyebrow mb-2">Application review</p>
-          <DialogTitle className="text-2xl">
+          <p className="eyebrow mb-1">Application review</p>
+          <DialogTitle className="text-2xl font-medium tracking-[-.03em] text-[#202124]">
             {applicant?.Name || "Applicant"}
           </DialogTitle>
-          <DialogDescription>
-            {departmentLabel(applicant?.Department)} · Preference{" "}
-            {applicant?.Pref || "—"}
+          <DialogDescription className="text-[#5f6368]">
+            {departmentLabel(applicant?.Department)} · Preference {applicant?.Pref || "—"}
           </DialogDescription>
         </DialogHeader>
+
         {applicant && (
           <>
-            <dl className="grid gap-4 rounded-xl border border-[#30332c] p-4 text-sm sm:grid-cols-2">
+            <dl className="grid gap-4 rounded-2xl border border-[#e8eaed] bg-[#f8f9fa] p-4 text-sm sm:grid-cols-2">
               {[
                 ["Email", applicant.Email],
                 ["Registration", applicant.RegistrationNumber],
                 ["Phone", applicant.Phone],
-                [
-                  "Status",
-                  applicant.shortlisted ? "Shortlisted" : "Pending review",
-                ],
+                ["Status", applicant.shortlisted ? "Shortlisted" : "Pending review"],
               ].map(([label, value]) => (
                 <div key={label}>
-                  <dt className="mb-1 text-xs text-[#a7aa9e]">{label}</dt>
-                  <dd className="break-words">{value || "Not provided"}</dd>
+                  <dt className="mb-1 text-xs text-[#80868b]">{label}</dt>
+                  <dd className="break-words text-[#202124]">{value || "Not provided"}</dd>
                 </div>
               ))}
             </dl>
-            <div className="space-y-5">
+
+            <div className="max-h-[50vh] space-y-5 overflow-y-auto pr-1">
               {questions.length ? (
                 questions.map(([question, answer], index) => (
                   <section
                     key={`${index}-${question}`}
-                    className="border-b border-[#30332c] pb-5"
+                    className="border-b border-[#e8eaed] pb-5"
                   >
-                    <h3 className="text-sm font-medium">
-                      <span className="mr-2 text-[#d7fa70]">
+                    <h3 className="text-sm font-medium text-[#202124]">
+                      <span className="mr-2 text-[#1a73e8]">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       {question}
                     </h3>
-                    <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-[#b9bdae]">
+                    <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-[#5f6368]">
                       {answer || "Not answered"}
                     </p>
                   </section>
                 ))
               ) : (
-                <p className="py-5 text-sm text-[#a7aa9e]">
+                <p className="py-5 text-sm text-[#5f6368]">
                   No responses were recorded for this application.
                 </p>
               )}
             </div>
+
             <button
               className="button-primary"
               disabled={pending}

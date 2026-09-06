@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 
 const inputClass =
-  "w-full rounded-lg border border-[#30332c] bg-[#101110] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#d7fa70]";
+  "w-full rounded-xl border border-[#dadce0] bg-white p-3 text-sm text-[#202124] placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]";
 
 export default function MailComposer({ recipients, handleRowSelection }) {
   const [open, setOpen] = useState(false);
@@ -29,6 +29,7 @@ export default function MailComposer({ recipients, handleRowSelection }) {
     .join(",");
   const [verifiedRecipients, setVerifiedRecipients] = useState("");
   const verified = preview && verifiedRecipients === recipientKey;
+
   async function send() {
     if (!verified || sending || tooManyRecipients) return;
     setSending(true);
@@ -37,7 +38,6 @@ export default function MailComposer({ recipients, handleRowSelection }) {
       await handleRowSelection({
         subject: subject.trim(),
         body: body.trim(),
-
       });
       setOpen(false);
       setPreview(false);
@@ -52,6 +52,7 @@ export default function MailComposer({ recipients, handleRowSelection }) {
       setSending(false);
     }
   }
+
   return (
     <Dialog
       open={open}
@@ -68,16 +69,18 @@ export default function MailComposer({ recipients, handleRowSelection }) {
           <Mail size={15} /> Compose email
         </button>
       </DialogTrigger>
-      <DialogContent className="border-[#30332c] bg-[#181a16] text-[#f3f1e9] sm:max-w-2xl">
+
+      <DialogContent className="border-[#dadce0] bg-white text-[#202124] shadow-xl sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Email selected applicants</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="font-medium text-[#202124]">Email selected applicants</DialogTitle>
+          <DialogDescription className="text-[#5f6368]">
             Review your message and {recipients.length} recipient
             {recipients.length === 1 ? "" : "s"} before sending.
           </DialogDescription>
         </DialogHeader>
+
         <div
-          className="max-h-24 overflow-y-auto rounded-lg border border-[#30332c] p-3 text-xs text-[#a7aa9e]"
+          className="max-h-24 overflow-y-auto rounded-xl border border-[#e8eaed] bg-[#f8f9fa] p-3 text-xs text-[#5f6368]"
           aria-label="Email recipients"
         >
           {recipients.map((item) => (
@@ -86,17 +89,19 @@ export default function MailComposer({ recipients, handleRowSelection }) {
             </p>
           ))}
         </div>
+
         {tooManyRecipients && (
-          <p role="alert" className="text-sm text-amber-200">
+          <p role="alert" className="rounded-xl bg-[#fef7e0] p-3 text-sm text-[#7c4a03]">
             Select 50 or fewer applicants to send an email batch.
           </p>
         )}
         {error && (
-          <p role="alert" className="text-sm text-red-300">
+          <p role="alert" className="rounded-xl bg-[#fce8e6] p-3 text-sm text-[#a50e0e]">
             {error}
           </p>
         )}
-        <label className="space-y-2 text-sm">
+
+        <label className="space-y-2 text-sm text-[#3c4043]">
           <span>Subject</span>
           <input
             value={subject}
@@ -110,7 +115,8 @@ export default function MailComposer({ recipients, handleRowSelection }) {
             placeholder="Your next chapter with GDG"
           />
         </label>
-        <label className="space-y-2 text-sm">
+
+        <label className="space-y-2 text-sm text-[#3c4043]">
           <span>Message</span>
           <textarea
             value={body}
@@ -125,28 +131,27 @@ export default function MailComposer({ recipients, handleRowSelection }) {
             placeholder="Write your message…"
           />
         </label>
-        <p className="text-xs text-[#a7aa9e]">
-          Use #name and #dept to personalise each email. Plain text and line
-          breaks are preserved. {body.length.toLocaleString()} / 3,000
-          characters.
+
+        <p className="text-xs text-[#80868b]">
+          Use #name and #dept to personalise each email. Plain text and line breaks are preserved. {body.length.toLocaleString()} / 3,000 characters.
         </p>
+
         {verified && (
-          <div className="rounded-xl border border-[#d7fa70]/30 p-4">
-            <p className="mb-2 text-xs text-[#d7fa70]">
+          <div className="rounded-2xl border border-[#d2e3fc] bg-[#e8f0fe] p-4">
+            <p className="mb-2 text-xs font-medium text-[#1a73e8]">
               Preview for {recipients[0]?.Name}
             </p>
-            <p className="font-medium">{subject}</p>
-            <p className="mt-3 whitespace-pre-wrap break-words text-sm text-[#b9bdae]">
+            <p className="font-medium text-[#202124]">{subject}</p>
+            <p className="mt-3 whitespace-pre-wrap break-words text-sm text-[#3c4043]">
               {renderMailBody(body, recipients[0] || {}).text}
             </p>
           </div>
         )}
+
         <div className="flex flex-wrap justify-end gap-3">
           <button
             className="button-secondary"
-            disabled={
-              sending || tooManyRecipients || !subject.trim() || !body.trim()
-            }
+            disabled={sending || tooManyRecipients || !subject.trim() || !body.trim()}
             onClick={() => {
               setPreview(true);
               setVerifiedRecipients(recipientKey);
@@ -156,9 +161,7 @@ export default function MailComposer({ recipients, handleRowSelection }) {
           </button>
           <button
             className="button-primary"
-            disabled={
-              !verified || sending || tooManyRecipients || !recipients.length
-            }
+            disabled={!verified || sending || tooManyRecipients || !recipients.length}
             onClick={send}
           >
             {sending
@@ -170,4 +173,3 @@ export default function MailComposer({ recipients, handleRowSelection }) {
     </Dialog>
   );
 }
-

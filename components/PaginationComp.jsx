@@ -12,12 +12,12 @@ export default function PaginationComp({
 }) {
   return (
     <nav aria-label="Application pages" className="flex items-center gap-3">
-      <span className="text-xs text-[#a7aa9e]">
+      <span className="text-xs text-[#5f6368]">
         {pages ? `Page ${pageIndex + 1} of ${pages}` : "0 applications"}
       </span>
       <button
         type="button"
-        className="button-secondary"
+        className="button-secondary min-h-0 p-2.5"
         disabled={!canPrev}
         onClick={previousPage}
         aria-label="Previous page"
@@ -26,7 +26,7 @@ export default function PaginationComp({
       </button>
       <button
         type="button"
-        className="button-secondary"
+        className="button-secondary min-h-0 p-2.5"
         disabled={!canNext}
         onClick={nextPage}
         aria-label="Next page"

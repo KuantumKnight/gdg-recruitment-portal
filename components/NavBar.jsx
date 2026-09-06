@@ -2,47 +2,49 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import UserButton from "./UserButton";
 import { authClient } from "@/lib/auth-client";
-import { ORGANIZATION_NAME } from "@/lib/recruitment";
+import { ORGANIZATION_NAME, RECRUITMENT_DEADLINE } from "@/lib/recruitment";
 
-const recruitmentDeadline = new Date("2026-09-30T23:59:59+05:30").getTime();
+const recruitmentDeadline = new Date(RECRUITMENT_DEADLINE).getTime();
 
 function Countdown() {
-  const [remaining, setRemaining] = useState(recruitmentDeadline - Date.now());
+  const [remaining, setRemaining] = useState(null);
 
   useEffect(() => {
+    if (!Number.isFinite(recruitmentDeadline)) {
+      setRemaining(0);
+      return undefined;
+    }
     const update = () => setRemaining(Math.max(0, recruitmentDeadline - Date.now()));
     update();
     const timer = window.setInterval(update, 1000);
     return () => window.clearInterval(timer);
   }, []);
 
-  const totalSeconds = Math.floor(remaining / 1000);
-  const values = [
-    [Math.floor(totalSeconds / 86400), "Days"],
-    [Math.floor((totalSeconds % 86400) / 3600), "Hours"],
-    [Math.floor((totalSeconds % 3600) / 60), "Minutes"],
-    [totalSeconds % 60, "Seconds"],
-  ];
+  if (remaining === null) return null;
+
+  if (remaining <= 0) {
+    return (
+      <span className="hidden rounded-full bg-[#f1f3f4] px-3.5 py-2 text-xs font-medium text-[#5f6368] lg:inline-flex">
+        Recruitment closed
+      </span>
+    );
+  }
+
+  const totalMinutes = Math.ceil(remaining / 60000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  const label = days > 0 ? `${days}d ${hours}h left` : hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`;
 
   return (
-    <div className="hidden flex-col items-center justify-center lg:flex" aria-label="Application deadline countdown">
-      <div className="flex items-center gap-3">
-        {values.map(([value, label], index) => (
-          <div className="flex items-center" key={label}>
-            <div className="flex flex-col items-center">
-              <div className="gdg-countdown-value font-bold text-white">{String(value).padStart(2, "0")}</div>
-              <div className="text-[10px] uppercase tracking-wide text-gray-400">{label}</div>
-            </div>
-            {index < values.length - 1 && <span className="px-3 text-2xl font-bold text-gray-500">:</span>}
-          </div>
-        ))}
-      </div>
-    </div>
+    <span className="hidden rounded-full bg-[#e6f4ea] px-3.5 py-2 text-xs font-medium text-[#137333] lg:inline-flex" aria-label={`Application deadline ${label}`}>
+      {label}
+    </span>
   );
 }
 
@@ -50,27 +52,71 @@ export default function NavBar() {
   const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
   const [open, setOpen] = useState(false);
-  const links = [{ label: "Departments", href: "/departments" }, ...(session?.user?.role === "admin" ? [{ label: "Workspace", href: "/admin" }] : [])];
+  const links = [
+    { label: "Departments", href: "/departments" },
+    ...(session?.user?.role === "admin" ? [{ label: "Workspace", href: "/admin" }] : []),
+  ];
   const close = () => setOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 px-5 py-3">
-      <nav className="flex min-h-[64px] items-center justify-between rounded-lg bg-[rgba(80,80,80,0.2)] px-5 py-4 backdrop-blur" aria-label="Main navigation">
-        <Link href="/" className="flex items-center gap-2 text-white" onClick={close}>
-          <Image src="/assets/gdg.svg" alt="GDG" width={40} height={40} className="rounded-full" priority />
-          <span className="hidden tracking-tight sm:block">{ORGANIZATION_NAME} | Recruitment Portal</span>
-          <span className="tracking-wide sm:hidden">Recruitment Portal</span>
+    <header className="sticky top-0 z-50 border-b border-[#e8eaed] bg-white/95 backdrop-blur-md">
+      <nav className="page-shell flex min-h-[64px] items-center justify-between gap-4" aria-label="Main navigation">
+        <Link href="/" className="flex min-w-0 items-center gap-3" onClick={close}>
+          <Image src="/assets/gdg.svg" alt="GDG" width={32} height={32} priority />
+          <span className="min-w-0">
+            <span className="block truncate text-[15px] font-medium text-[#202124] sm:hidden">GDG VIT Chennai</span>
+            <span className="hidden truncate text-[15px] font-medium text-[#202124] sm:block">{ORGANIZATION_NAME}</span>
+            <span className="block text-[11px] text-[#80868b]">Recruitment</span>
+          </span>
         </Link>
-        <div className="flex items-center justify-center gap-3">
+
+        <div className="flex items-center gap-2">
           <Countdown />
-          <div className="hidden items-center gap-5 lg:flex">
-            {links.map((link) => <Link key={link.href} href={link.href} className={`text-sm transition-colors hover:text-white ${pathname === link.href ? "text-white" : "text-gray-300"}`}>{link.label}</Link>)}
-            {isPending ? <span className="text-sm text-gray-400">Checking session…</span> : session?.user ? <UserButton user={session.user} /> : <Link href="/auth/signin" className="button-primary py-2.5">Sign in <ArrowUpRight size={15} /></Link>}
+          <div className="hidden items-center gap-1 lg:flex">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${pathname === link.href ? "bg-[#e8f0fe] text-[#0b57d0]" : "text-[#5f6368] hover:bg-[#f1f3f4] hover:text-[#202124]"}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {isPending ? null : session?.user ? (
+              <div className="ml-2"><UserButton user={session.user} /></div>
+            ) : (
+              <Link href="/auth/signin" className="button-primary ml-2 min-h-0 px-5 py-2.5">Sign in</Link>
+            )}
           </div>
-          <button type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} className="rounded-full border border-input bg-background p-2 text-white lg:hidden" onClick={() => setOpen((value) => !value)}>{open ? <X size={18} /> : <Menu size={18} />}</button>
+
+          <button
+            type="button"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="rounded-full p-2.5 text-[#5f6368] hover:bg-[#f1f3f4] lg:hidden"
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </nav>
-      {open && <div className="mx-auto mt-2 max-w-[1180px] rounded-lg border border-[#333] bg-[#1a1a1a] p-4 lg:hidden"><div className="grid gap-2">{links.map((link) => <Link key={link.href} href={link.href} onClick={close} className="rounded-xl px-3 py-3 text-sm text-white hover:bg-[#252525]">{link.label}</Link>)}{session?.user ? <UserButton user={session.user} /> : <Link href="/auth/signin" onClick={close} className="button-primary mt-2">Sign in <ArrowUpRight size={15} /></Link>}</div></div>}
+
+      {open && (
+        <div className="border-t border-[#e8eaed] bg-white lg:hidden">
+          <div className="page-shell grid gap-1 py-3">
+            {links.map((link) => (
+              <Link key={link.href} href={link.href} onClick={close} className="rounded-xl px-3 py-3 text-sm font-medium text-[#3c4043] hover:bg-[#f1f3f4]">
+                {link.label}
+              </Link>
+            ))}
+            {session?.user ? (
+              <div className="mt-1 px-1 py-2"><UserButton user={session.user} /></div>
+            ) : (
+              <Link href="/auth/signin" onClick={close} className="button-primary mt-2 w-full">Sign in with Google</Link>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
