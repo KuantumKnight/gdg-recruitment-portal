@@ -1,16 +1,9 @@
-"use client";
+import GDGLoader from "@/components/GDGLoader";
 
-// React import
-import React from "react";
-// Component import
-import DWASFWLoader from "@/components/GDGLoader";
-
-const loading = () => {
+export default function Loading() {
   return (
-    <div>
-      <DWASFWLoader />
-    </div>
+    <main className="min-h-screen bg-[#101110]">
+      <GDGLoader label="Loading recruitment portal…" />
+    </main>
   );
-};
-
-export default loading;
+}
