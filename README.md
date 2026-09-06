@@ -279,10 +279,10 @@ For production, also add:
 https://<production-domain>/api/auth/callback/google
 ```
 
-For the current Vercel deployment that means the Google OAuth configuration should include the matching callback for:
+For the current Vercel deployment, the matching callback is:
 
 ```text
-https://gdg-recruitment-portal-omega.vercel.app
+https://gdg-recruitment-portal-omega.vercel.app/api/auth/callback/google
 ```
 
 ### Run
