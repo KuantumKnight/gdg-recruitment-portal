@@ -17,25 +17,28 @@ export default async function AdminPage() {
     if (error.status === 401) redirect("/auth/signin");
     if (error.status !== 403) throw error;
     return (
-      <main>
+      <main className="min-h-screen bg-[#f8f9fa]">
         <NavBar />
         <section className="page-shell py-24">
-          <p className="eyebrow">Recruitment workspace</p>
-          <h1 className="mt-5 text-4xl font-semibold">
-            Admin access required.
-          </h1>
-          <p className="mt-4 text-[#a7aa9e]">
-            Your account does not have permission to view applicant responses.
-          </p>
-          <Link href="/" className="button-secondary mt-8 inline-flex">
-            Back to the community
-          </Link>
+          <div className="max-w-xl rounded-[24px] border border-[#dadce0] bg-white p-8 shadow-[0_1px_2px_rgba(60,64,67,.08)]">
+            <p className="eyebrow">Recruitment workspace</p>
+            <h1 className="mt-4 text-4xl font-medium tracking-[-.04em] text-[#202124]">
+              Admin access required.
+            </h1>
+            <p className="mt-4 text-sm leading-6 text-[#5f6368]">
+              Your Google account is valid for the candidate portal but does not have permission to view applicant responses.
+            </p>
+            <Link href="/" className="button-secondary mt-7 inline-flex">
+              Back to home
+            </Link>
+          </div>
         </section>
       </main>
     );
   }
+
   return (
-    <main>
+    <main className="min-h-screen bg-[#f8f9fa]">
       <NavBar />
       <AdminContent />
     </main>
