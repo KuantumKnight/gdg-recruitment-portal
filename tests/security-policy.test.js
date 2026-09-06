@@ -5,6 +5,7 @@ import {
   isVerifiedInstitutionalUser,
 } from "../lib/auth-policy";
 import { safeCallbackURL } from "../lib/auth-redirect";
+import { getAuthBaseURL } from "../lib/auth-config";
 
 describe("auth policy", () => {
   it("accepts only the VIT student Google domain", () => {
@@ -40,5 +41,15 @@ describe("auth policy", () => {
     expect(safeCallbackURL("/join/web-dev")).toBe("/join/web-dev");
     expect(safeCallbackURL("https://attacker.test")).toBe("/");
     expect(safeCallbackURL("//attacker.test")).toBe("/");
+  });
+
+  it("never falls back to localhost for a production deployment", () => {
+    expect(getAuthBaseURL({ NODE_ENV: "production" })).toBe(
+      "https://gdg-recruitment-portal-omega.vercel.app",
+    );
+    expect(getAuthBaseURL({ BETTER_AUTH_URL: "https://example.test/" })).toBe(
+      "https://example.test",
+    );
+    expect(getAuthBaseURL({ NODE_ENV: "development" })).toBe("http://localhost:3000");
   });
 });

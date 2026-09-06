@@ -19,6 +19,9 @@ function authErrorMessage(value) {
   if (code.includes("email_not_verified")) {
     return "Google could not verify the email address on this account.";
   }
+  if (code.includes("provider_not_found") || code.includes("social_provider_not_found") || code.includes("not_configured")) {
+    return "Google sign-in is not configured for this deployment yet. Please contact the portal administrator.";
+  }
   if (code.includes("access_denied")) {
     return "Google sign-in was cancelled.";
   }
