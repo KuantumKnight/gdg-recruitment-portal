@@ -41,9 +41,9 @@ export default function Hero() {
         <div className="mx-auto mt-10 max-w-3xl space-y-6 text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[.24em] text-blue-300">Google Developer Groups on Campus VIT Chennai</p>
           <h1 className="leading-none text-white" style={{ fontWeight: 800, fontSize: "clamp(32px, 8vw, 55px)" }}>Ready to Make Your Mark?</h1>
-          <p className="mx-auto max-w-2xl text-gray-300" style={{ fontWeight: 300, fontSize: "clamp(18px, 4vw, 30px)", lineHeight: 1 }}>Innovate with us — your journey starts here.</p>
-          <div className="flex justify-center gap-x-5">
-            <Link href="/departments" className="mt-8 inline-flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3 text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-blue-700 sm:px-12 sm:py-4 sm:text-xl">Join us <ArrowRight size={19} /></Link>
+          <p className="mx-auto max-w-2xl text-gray-300" style={{ fontWeight: 300, fontSize: "clamp(18px, 4vw, 30px)", lineHeight: 1 }}>Explore the teams, projects, and people behind GDG on Campus VIT Chennai.</p>
+          <div className="flex flex-wrap justify-center gap-x-5">
+            <Link href="/departments" className="mt-8 inline-flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3 text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-blue-700 sm:px-12 sm:py-4 sm:text-xl">Explore teams <ArrowRight size={19} /></Link>
             <a href="https://docs.google.com/document/d/1nkCCHtfCWqLvFjlYgb5EmNG9xmhrsuUEDxEluKtO_Ug/edit?usp=sharing" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-red-500 px-8 py-3 text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-red-700 sm:px-12 sm:py-4 sm:text-xl">FAQs <ArrowRight size={19} /></a>
           </div>
         </div>
