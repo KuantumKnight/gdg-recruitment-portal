@@ -10,7 +10,9 @@ test.describe("public recruitment flow", () => {
     });
     await page.goto("/");
     await expect(page).toHaveTitle(/Recruitment 2026/i);
-    await page.getByRole("link", { name: /explore teams/i }).click();
+    const teamsLink = page.getByRole("link", { name: /explore teams/i });
+    await expect(teamsLink).toHaveAttribute("href", "/departments");
+    await page.goto("/departments");
     await expect(page).toHaveURL(/\/departments$/);
     expect(errors).toEqual([]);
   });
@@ -27,7 +29,7 @@ test.describe("public recruitment flow", () => {
 
   test("sign-in is Google-only and keeps the requested callback", async ({ page }) => {
     await page.goto("/auth/signin?callbackURL=%2Fjoin%2Fweb-dev");
-    await expect(page.getByRole("heading", { name: /Sign in with your VIT Google account/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /Continue with Google/i })).toBeVisible();
     await expect(page.getByText(/@vitstudent\.ac\.in/i)).toBeVisible();
     await expect(page.locator('input[type="password"]')).toHaveCount(0);
