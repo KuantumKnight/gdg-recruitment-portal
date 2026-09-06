@@ -8,12 +8,14 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <main className="grid min-h-[60vh] place-items-center bg-[#101110] px-5 text-center text-[#f3f1e9]">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[.2em] text-[#d7fa70]">Something went sideways</p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-[-.05em]">We couldn’t load this page.</h1>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[#a7aa9e]">Try again, or head back to departments while we recover your place.</p>
-        <button type="button" onClick={() => reset()} className="mt-8 rounded-full bg-[#d7fa70] px-5 py-3 text-sm font-bold text-[#101110]">Try again</button>
+    <main className="grid min-h-[60vh] place-items-center bg-[#f8f9fa] px-5 text-center text-[#202124]">
+      <div className="max-w-lg rounded-[24px] border border-[#dadce0] bg-white px-8 py-10 shadow-[0_1px_2px_rgba(60,64,67,.08)]">
+        <p className="text-sm font-medium text-[#d93025]">Something went wrong</p>
+        <h1 className="mt-3 text-4xl font-medium tracking-[-.04em]">We couldn’t load this page.</h1>
+        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[#5f6368]">
+          Try the request again. If the problem continues, return to the department browser and continue from there.
+        </p>
+        <button type="button" onClick={() => reset()} className="button-primary mt-7 px-6">Try again</button>
       </div>
     </main>
   );
