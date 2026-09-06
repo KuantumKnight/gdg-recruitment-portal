@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { departments } from "../lib/catalog";
 import { buildSubmissionPayload, createApplicationSchema, MOTIVATION_QUESTION } from "../lib/validation/application";
 import { identityKey, saveApplication } from "../lib/server/applications";
+import { registrationIdentityKey } from "../lib/application-identity";
 import { isRecruitmentOpen } from "../lib/recruitment";
 import { ApiError, readJson } from "../lib/server/api-error";
 const department = departments[0];
@@ -69,8 +70,13 @@ describe("response persistence", () => {
     expect(results.find((result) => result.status === 'rejected').reason.status).toBe(409);
     expect([...db.records.keys()].filter((key) => key.startsWith('formData/'))).toHaveLength(2);
   });
-  it("counts legacy documents when initializing the applicant index", async () => {
-    const db = database([{ Email: user.email, Department: 'legacy-one' }, { Email: user.email, Department: 'legacy-two' }]);
+  it("enforces the limit across accounts sharing a registration number", async () => {
+    const db = database();
+    await saveApplication(db, user, { ...payload(), Department: "one" });
+    await saveApplication(db, { id: "user-2", email: "other@example.com" }, { ...payload(), Department: "two" });
+    await expect(saveApplication(db, { id: "user-3", email: "third@example.com" }, { ...payload(), Department: "three" })).rejects.toMatchObject({ status: 409 });
+  });  it("counts legacy documents when initializing the applicant index", async () => {
+    const db = database([{ Email: user.email, RegistrationNumber: '25BCE5612', Department: 'legacy-one' }, { Email: user.email, RegistrationNumber: '25BCE5612', Department: 'legacy-two' }]);
     await expect(saveApplication(db, user, payload())).rejects.toMatchObject({ status: 409 });
   });
   it("normalizes applicant index identity", () => expect(identityKey(' Applicant@Example.com ')).toBe(identityKey('applicant@example.com')));
