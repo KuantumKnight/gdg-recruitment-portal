@@ -7,19 +7,32 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import UserButton from "./UserButton";
 import { authClient } from "@/lib/auth-client";
-import { ORGANIZATION_NAME } from "@/lib/recruitment";
+import { ORGANIZATION_NAME, RECRUITMENT_DEADLINE } from "@/lib/recruitment";
 
-const recruitmentDeadline = new Date("2026-09-30T23:59:59+05:30").getTime();
+const recruitmentDeadline = new Date(RECRUITMENT_DEADLINE).getTime();
 
 function Countdown() {
-  const [remaining, setRemaining] = useState(recruitmentDeadline - Date.now());
+  const [remaining, setRemaining] = useState(null);
 
   useEffect(() => {
+    if (!Number.isFinite(recruitmentDeadline)) {
+      setRemaining(0);
+      return undefined;
+    }
+
     const update = () => setRemaining(Math.max(0, recruitmentDeadline - Date.now()));
     update();
     const timer = window.setInterval(update, 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  if (remaining === null) {
+    return <span className="hidden text-xs font-semibold uppercase tracking-[.16em] text-gray-400 lg:block">Checking deadline…</span>;
+  }
+
+  if (remaining <= 0) {
+    return <span className="hidden rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[.16em] text-gray-300 lg:block">Recruitment closed</span>;
+  }
 
   const totalSeconds = Math.floor(remaining / 1000);
   const values = [
