@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SubmissionsProvider } from "@/components/SubmissionsProvider";
+import FirebaseAnalytics from "@/components/FirebaseAnalytics";
 import { ORGANIZATION_NAME } from "@/lib/recruitment";
 import "./globals.css";
 
@@ -10,5 +11,5 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return <html lang="en"><body><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}><SubmissionsProvider>{children}<Toaster /></SubmissionsProvider></ThemeProvider></body></html>;
+  return <html lang="en"><body><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}><FirebaseAnalytics /><SubmissionsProvider>{children}<Toaster /></SubmissionsProvider></ThemeProvider></body></html>;
 }
