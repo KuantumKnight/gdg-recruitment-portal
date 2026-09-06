@@ -25,9 +25,7 @@ function Countdown() {
     return () => window.clearInterval(timer);
   }, []);
 
-  if (remaining === null) {
-    return <span className="hidden text-xs text-[#80868b] lg:inline">Checking deadline…</span>;
-  }
+  if (remaining === null) return null;
 
   if (remaining <= 0) {
     return (
@@ -62,34 +60,32 @@ export default function NavBar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#e8eaed] bg-white/95 backdrop-blur-md">
-      <nav className="page-shell flex min-h-[68px] items-center justify-between gap-4" aria-label="Main navigation">
+      <nav className="page-shell flex min-h-[64px] items-center justify-between gap-4" aria-label="Main navigation">
         <Link href="/" className="flex min-w-0 items-center gap-3" onClick={close}>
-          <Image src="/assets/gdg.svg" alt="GDG" width={36} height={36} priority />
+          <Image src="/assets/gdg.svg" alt="GDG" width={32} height={32} priority />
           <span className="min-w-0">
             <span className="block truncate text-[15px] font-medium text-[#202124] sm:hidden">GDG VIT Chennai</span>
             <span className="hidden truncate text-[15px] font-medium text-[#202124] sm:block">{ORGANIZATION_NAME}</span>
-            <span className="block text-[11px] text-[#80868b]">Recruitment Portal</span>
+            <span className="block text-[11px] text-[#80868b]">Recruitment</span>
           </span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Countdown />
           <div className="hidden items-center gap-1 lg:flex">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${pathname === link.href ? "bg-[#e8f0fe] text-[#1a73e8]" : "text-[#5f6368] hover:bg-[#f1f3f4] hover:text-[#202124]"}`}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${pathname === link.href ? "bg-[#e8f0fe] text-[#0b57d0]" : "text-[#5f6368] hover:bg-[#f1f3f4] hover:text-[#202124]"}`}
               >
                 {link.label}
               </Link>
             ))}
-            {isPending ? (
-              <span className="ml-2 text-xs text-[#80868b]">Checking session…</span>
-            ) : session?.user ? (
+            {isPending ? null : session?.user ? (
               <div className="ml-2"><UserButton user={session.user} /></div>
             ) : (
-              <Link href="/auth/signin" className="button-primary ml-2 min-h-0 py-2.5 px-5">Sign in</Link>
+              <Link href="/auth/signin" className="button-primary ml-2 min-h-0 px-5 py-2.5">Sign in</Link>
             )}
           </div>
 
