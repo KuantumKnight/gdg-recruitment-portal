@@ -11,5 +11,17 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return <html lang="en"><body><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}><FirebaseAnalytics /><SubmissionsProvider>{children}<Toaster /></SubmissionsProvider></ThemeProvider></body></html>;
+  return (
+    <html lang="en">
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <FirebaseAnalytics />
+          <SubmissionsProvider>
+            {children}
+            <Toaster />
+          </SubmissionsProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }
