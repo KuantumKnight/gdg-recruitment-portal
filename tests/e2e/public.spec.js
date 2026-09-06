@@ -3,7 +3,11 @@ import { expect, test } from "@playwright/test";
 test.describe("public recruitment flow", () => {
   test("homepage and navigation load without browser errors", async ({ page }) => {
     const errors = [];
-    page.on("console", (message) => { if (message.type() === "error" && !message.text().includes("hydration-mismatch")) errors.push(message.text()); });
+    page.on("console", (message) => {
+      if (message.type() === "error" && !message.text().includes("hydration-mismatch")) {
+        errors.push(message.text());
+      }
+    });
     await page.goto("/");
     await expect(page).toHaveTitle(/Recruitment 2026/i);
     await page.getByRole("link", { name: /explore teams/i }).click();
@@ -21,30 +25,32 @@ test.describe("public recruitment flow", () => {
     await expect(page).toHaveURL(/\/join\/[^/]+$/);
   });
 
-  test("sign-in keeps the requested application callback", async ({ page }) => {
+  test("sign-in is Google-only and keeps the requested callback", async ({ page }) => {
     await page.goto("/auth/signin?callbackURL=%2Fjoin%2Fweb-dev");
-    await expect(page.getByRole("heading", { name: /Welcome back|Start your story/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Sign in with your VIT Google account/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Continue with Google/i })).toBeVisible();
+    await expect(page.getByText(/@vitstudent\.ac\.in/i)).toBeVisible();
+    await expect(page.locator('input[type="password"]')).toHaveCount(0);
+    await expect(page.locator('input[type="email"]')).toHaveCount(0);
     await expect(page).toHaveURL(/callbackURL=%2Fjoin%2Fweb-dev/);
-  });
-
-  test("password recovery is discoverable and rejects missing reset tokens", async ({ page }) => {
-    await page.goto("/auth/signin");
-    await page.getByRole("link", { name: /forgot password/i }).click();
-    await expect(page).toHaveURL(/\/auth\/forgot-password$/);
-    await expect(page.getByRole("heading", { name: /Reset your password/i })).toBeVisible();
-    await page.goto("/auth/reset-password");
-    await expect(page.getByText(/missing, invalid, or expired/i)).toBeVisible();
-    await expect(page.getByRole("link", { name: /Request a new link/i })).toBeVisible();
   });
 
   test("mobile navigation opens and the page has no horizontal overflow", async ({ page }) => {
     await page.goto("/");
     if ((page.viewportSize()?.width ?? 0) > 768) {
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        ),
+      ).toBe(true);
       return;
     }
     await page.getByRole("button", { name: /open menu/i }).click();
     await expect(page.getByRole("link", { name: "Departments" })).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
   });
 });
