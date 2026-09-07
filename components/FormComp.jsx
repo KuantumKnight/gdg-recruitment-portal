@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { ArrowOutward } from "@material-symbols-svg/react/icons/arrow-outward";
+import { TaskAlt } from "@material-symbols-svg/react/icons/task-alt";
+import { VerifiedUser } from "@material-symbols-svg/react/icons/verified-user";
 import { authClient } from "@/lib/auth-client";
 import { getDepartment } from "@/lib/catalog";
 import {
@@ -44,7 +46,7 @@ export default function FormComp({ dept1, dept2 }) {
           className={s.primary}
           href={`/auth/signin?callbackURL=${encodeURIComponent(`/join/${chosen.map((d) => d.id).join("/")}`)}`}
         >
-          Sign in to continue <ArrowUpRight size={16} />
+          Sign in to continue <ArrowOutward size={16} />
         </Link>
       </div>
     );
@@ -68,7 +70,7 @@ function ClosedApplications() {
         departments and find where your curiosity could take you next.
       </p>
       <Link className={s.primary} href="/departments">
-        Explore departments <ArrowUpRight size={16} />
+        Explore departments <ArrowOutward size={16} />
       </Link>
     </div>
   );
@@ -292,7 +294,7 @@ function Application({ user, chosen }) {
     return (
       <div className={s.shell}>
         <div className={s.success}>
-          <CheckCircle2 size={56} />
+          <TaskAlt size={56} />
           <h1>You’re on the list.</h1>
           <p>
             Your application{chosen.length > 1 ? "s are" : " is"} saved for{" "}
@@ -426,7 +428,7 @@ function Application({ user, chosen }) {
                 {busy
                   ? "Saving your story…"
                   : `Submit ${pending.length > 1 ? "applications" : "application"}`}
-                <ArrowUpRight size={17} />
+                <ArrowOutward size={17} />
               </button>
             </div>
           </fieldset>
@@ -453,7 +455,7 @@ function Application({ user, chosen }) {
             aria-label="Required answers completed"
           />
           <p className={s.draft}>
-            <ShieldCheck size={15} />
+            <VerifiedUser size={15} />
             {draftStatus}
           </p>
           <button
