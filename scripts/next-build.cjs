@@ -6,7 +6,10 @@ const { spawnSync } = require("node:child_process");
 const env = { ...process.env };
 if (!env.BETTER_AUTH_SECRET) env.BETTER_AUTH_SECRET = randomBytes(32).toString("hex");
 
-const command = process.platform === "win32" ? "next.cmd" : "next";
-const result = spawnSync(command, ["build"], { stdio: "inherit", env, shell: true });
+const nextBin = require.resolve("next/dist/bin/next");
+const result = spawnSync(process.execPath, [nextBin, "build"], {
+  stdio: "inherit",
+  env,
+});
 if (result.error) throw result.error;
 process.exit(result.status ?? 1);

@@ -37,7 +37,7 @@ export default function SignOutPage() {
   }, [router]);
 
   return (
-    <main className="min-h-screen bg-[#f8f9fa]">
+    <main>
       <GDGLoader label="Signing you out…" />
     </main>
   );

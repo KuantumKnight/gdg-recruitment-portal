@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail } from "lucide-react";
+import { Mail } from "@material-symbols-svg/react/icons/mail";
 import { renderMailBody } from "@/lib/mail";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 
 const inputClass =
-  "w-full rounded-xl border border-[#dadce0] bg-white p-3 text-sm text-[#202124] placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]";
+  "w-full border border-[#111] bg-white p-3 text-sm text-[#202124] placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]";
 
 export default function MailComposer({ recipients, handleRowSelection }) {
   const [open, setOpen] = useState(false);
@@ -70,7 +70,7 @@ export default function MailComposer({ recipients, handleRowSelection }) {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="border-[#dadce0] bg-white text-[#202124] shadow-xl sm:max-w-2xl">
+      <DialogContent className="rounded-none border-[#111] bg-white text-[#202124] shadow-xl sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-medium text-[#202124]">Email selected applicants</DialogTitle>
           <DialogDescription className="text-[#5f6368]">
@@ -80,7 +80,7 @@ export default function MailComposer({ recipients, handleRowSelection }) {
         </DialogHeader>
 
         <div
-          className="max-h-24 overflow-y-auto rounded-xl border border-[#e8eaed] bg-[#f8f9fa] p-3 text-xs text-[#5f6368]"
+          className="max-h-24 overflow-y-auto border border-[#111] bg-[#f8f9fa] p-3 text-xs text-[#5f6368]"
           aria-label="Email recipients"
         >
           {recipients.map((item) => (
@@ -91,12 +91,12 @@ export default function MailComposer({ recipients, handleRowSelection }) {
         </div>
 
         {tooManyRecipients && (
-          <p role="alert" className="rounded-xl bg-[#fef7e0] p-3 text-sm text-[#7c4a03]">
+          <p role="alert" className="border border-[#fbbc04] bg-[#fef7e0] p-3 text-sm text-[#7c4a03]">
             Select 50 or fewer applicants to send an email batch.
           </p>
         )}
         {error && (
-          <p role="alert" className="rounded-xl bg-[#fce8e6] p-3 text-sm text-[#a50e0e]">
+          <p role="alert" className="border border-[#ea4335] bg-[#fce8e6] p-3 text-sm text-[#a50e0e]">
             {error}
           </p>
         )}
@@ -137,7 +137,7 @@ export default function MailComposer({ recipients, handleRowSelection }) {
         </p>
 
         {verified && (
-          <div className="rounded-2xl border border-[#d2e3fc] bg-[#e8f0fe] p-4">
+          <div className="border border-[#1a73e8] bg-[#e8f0fe] p-4">
             <p className="mb-2 text-xs font-medium text-[#1a73e8]">
               Preview for {recipients[0]?.Name}
             </p>

@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, LockKeyhole } from "lucide-react";
+import { ArrowBack } from "@material-symbols-svg/react/icons/arrow-back";
+import { ArrowForward } from "@material-symbols-svg/react/icons/arrow-forward";
+import { Lock } from "@material-symbols-svg/react/icons/lock";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { INSTITUTIONAL_DOMAIN } from "@/lib/auth-policy";
@@ -44,7 +46,6 @@ export default function SignInPage() {
     if (session?.user && !isPending) router.replace(callbackURL);
   }, [callbackURL, isPending, router, session]);
 
-  if (isPending) return <GDGLoader label="Checking your Google session…" />;
   if (session?.user) return <GDGLoader label="Redirecting…" />;
 
   async function continueWithGoogle() {
@@ -71,50 +72,40 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f8fafd] px-5 py-10 text-[#1f1f1f]">
-      <section className="w-full max-w-[448px] rounded-[28px] border border-[#dadce0] bg-white px-6 py-8 shadow-[0_1px_2px_rgba(60,64,67,.08),0_2px_8px_rgba(60,64,67,.06)] sm:px-10 sm:py-10">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#e0e3e7] bg-white shadow-sm">
-          <Image src="/assets/google-g.svg" alt="Google" width={24} height={24} priority />
+    <main className="auth-page">
+      <section className="auth-poster" aria-label="GDG on Campus recruitment">
+        <div className="auth-poster-brand">
+          <Image src="/assets/gdg.svg" alt="" width={56} height={42} priority />
+          <span>GDG on Campus · VIT Chennai</span>
         </div>
+        <h2>Ideas need people.</h2>
+        <p className="auth-poster-meta">Recruitment issue &apos;26 · Student access</p>
+      </section>
 
-        <h1 className="mt-8 text-[32px] font-normal leading-tight tracking-[-.025em] text-[#202124]">
-          Sign in
-        </h1>
-        <p className="mt-2 text-[15px] leading-6 text-[#5f6368]">
-          Use your VIT student Google account to continue to the GDG recruitment portal.
-        </p>
-
-        <div className="mt-6 inline-flex rounded-full bg-[#e8f0fe] px-3 py-1.5 text-xs font-medium text-[#174ea6]">
-          Only @{INSTITUTIONAL_DOMAIN}
+      <section className="auth-panel">
+        <div className="auth-mark">
+          <Image src="/assets/google-g.svg" alt="Google" width={28} height={28} priority />
         </div>
+        <h1>Sign in</h1>
+        <p>Use your VIT student Google account to continue to the GDG recruitment portal.</p>
+        <div className="auth-domain">Only @{INSTITUTIONAL_DOMAIN}</div>
 
         {(clientError || oauthError) && (
-          <div className="mt-6 rounded-xl border border-[#f6aea9] bg-[#fce8e6] px-4 py-3 text-sm leading-5 text-[#a50e0e]" role="alert">
-            {clientError || oauthError}
-          </div>
+          <div className="auth-error" role="alert">{clientError || oauthError}</div>
         )}
 
-        <button
-          type="button"
-          onClick={continueWithGoogle}
-          disabled={submitting}
-          className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[#747775] bg-white px-5 text-sm font-medium text-[#1f1f1f] transition-[background-color,box-shadow] hover:bg-[#f8fafd] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b57d0] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Image src="/assets/google-g.svg" alt="" width={18} height={18} aria-hidden="true" />
-          {submitting ? "Opening Google…" : "Continue with Google"}
+        <button type="button" onClick={continueWithGoogle} disabled={submitting} className="auth-google-button">
+          <span className="auth-google-label">
+            <Image src="/assets/google-g.svg" alt="" width={20} height={20} aria-hidden="true" />
+            {submitting ? "Opening Google…" : "Continue with Google"}
+          </span>
+          <ArrowForward size={22} />
         </button>
 
-        <p className="mt-6 text-xs leading-5 text-[#80868b]">
-          Personal Gmail accounts, faculty accounts, and other domains are rejected by the server even if the browser request is modified.
-        </p>
-
-        <div className="mt-8 flex items-center justify-between gap-4 border-t border-[#e8eaed] pt-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[#0b57d0] hover:underline">
-            <ArrowLeft size={15} aria-hidden="true" /> Back
-          </Link>
-          <span className="inline-flex items-center gap-1.5 text-xs text-[#80868b]">
-            <LockKeyhole size={13} aria-hidden="true" /> Google OAuth
-          </span>
+        <p className="auth-security-note">Personal Gmail accounts, faculty accounts, and other domains are rejected by the server even if the browser request is modified.</p>
+        <div className="auth-footer-row">
+          <Link href="/"><ArrowBack size={17} /> Back to issue</Link>
+          <span><Lock size={16} /> Google OAuth</span>
         </div>
       </section>
     </main>
