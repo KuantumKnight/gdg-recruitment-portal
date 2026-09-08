@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowDownward } from "@material-symbols-svg/react/icons/arrow-downward";
+import { Refresh } from "@material-symbols-svg/react/icons/refresh";
+import { VerifiedUser } from "@material-symbols-svg/react/icons/verified-user";
 import DataTable from "./DataTable";
 
 export default function AdminContent() {
@@ -64,27 +66,28 @@ export default function AdminContent() {
   }, [loadBatch]);
 
   return (
-    <section className="bg-[#f8f9fa] py-12 sm:py-16">
-      <div className="page-shell">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-5">
+    <section className="admin-workspace">
+      <div className="admin-shell">
+        <div className="admin-masthead">
+          <span className="admin-issue" aria-hidden="true">01</span>
           <div>
             <p className="eyebrow">Recruitment workspace</p>
-            <h1 className="mt-3 text-4xl font-medium tracking-[-.04em] text-[#202124] sm:text-5xl">
+            <h1 className="admin-title">
               Review the next builders.
             </h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-[#5f6368] sm:text-base">
+            <p className="admin-description">
               Review responses, shortlist applicants, export loaded records, and communicate with selected candidates.
             </p>
           </div>
-          <span className="flex items-center gap-2 rounded-full border border-[#a8dab5] bg-[#e6f4ea] px-4 py-2 text-xs font-medium text-[#137333]">
-            <ShieldCheck size={15} /> Admin workspace
+          <span className="admin-badge">
+            <VerifiedUser size={20} /> Admin workspace
           </span>
         </div>
 
         {error && (
           <div
             role="alert"
-            className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#f6aea9] bg-[#fce8e6] p-4 text-sm text-[#a50e0e]"
+            className="admin-error"
           >
             <p>{error}</p>
             <button
@@ -92,13 +95,13 @@ export default function AdminContent() {
               onClick={() => loadBatch(cursor)}
               disabled={loading}
             >
-              <RefreshCw size={15} /> Try again
+              <Refresh size={15} /> Try again
             </button>
           </div>
         )}
 
         {loading && !applicants.length ? (
-          <div role="status" className="panel p-12 text-center text-[#5f6368]">
+          <div role="status" className="admin-loading">
             Loading applications…
           </div>
         ) : (
@@ -110,13 +113,13 @@ export default function AdminContent() {
         )}
 
         {hasMore && (
-          <div className="mt-6 flex flex-col items-center gap-3">
+          <div className="admin-load-more">
             <button
               onClick={() => loadBatch(cursor)}
               disabled={loading}
               className="button-secondary"
             >
-              <ArrowDown size={16} />
+              <ArrowDownward size={16} />
               {loading ? "Loading…" : "Load next 50 applications"}
             </button>
             <p className="text-xs text-[#80868b]">

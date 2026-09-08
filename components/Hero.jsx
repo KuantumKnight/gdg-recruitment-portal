@@ -1,67 +1,55 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Code2, Layers3, Users } from "lucide-react";
+import { ArrowForward } from "@material-symbols-svg/react/icons/arrow-forward";
+import { ArrowOutward } from "@material-symbols-svg/react/icons/arrow-outward";
 import { isRecruitmentOpen } from "@/lib/recruitment";
 
 const principles = [
-  { title: "Build real things", text: "Work on practical projects with people who care about the outcome.", Icon: Code2, color: "#4285F4" },
-  { title: "Learn together", text: "Ask better questions, share progress, and grow through collaboration.", Icon: BookOpen, color: "#34A853" },
-  { title: "Find your team", text: "Choose the domain where your curiosity and skills have momentum.", Icon: Users, color: "#EA4335" },
-  { title: "Ship responsibly", text: "Own the details, iterate on feedback, and build work you can explain.", Icon: Layers3, color: "#FBBC04" },
+  ["01", "Build real things", "Practical projects, visible outcomes, and work you can explain."],
+  ["02", "Learn together", "Better questions, shared progress, and a generous community."],
+  ["03", "Find your team", "Choose the domain where your curiosity already has momentum."],
+  ["04", "Ship responsibly", "Own the details, listen closely, and iterate with intent."],
 ];
 
 export default function Hero() {
   const open = isRecruitmentOpen();
 
   return (
-    <section className="bg-white">
-      <div className="page-shell py-16 sm:py-24 lg:py-28">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="mx-auto flex w-fit items-center gap-1.5" aria-hidden="true">
-            <span className="h-1.5 w-8 rounded-full bg-[#4285f4]" />
-            <span className="h-1.5 w-8 rounded-full bg-[#ea4335]" />
-            <span className="h-1.5 w-8 rounded-full bg-[#fbbc04]" />
-            <span className="h-1.5 w-8 rounded-full bg-[#34a853]" />
+    <section className="broadsheet-home" aria-labelledby="home-title">
+      <div className="broadsheet-hero-grid">
+        <aside className="hero-side-rail" aria-hidden="true"><span>GDG on Campus · VIT Chennai</span></aside>
+        <div className="hero-story">
+          <div className="hero-headline">
+            <h1 id="home-title"><span>Build what</span><span>matters.</span></h1>
           </div>
-
-          <p className="mt-8 text-sm font-medium text-[#0b57d0]">
-            Google Developer Groups on Campus · VIT Chennai
-          </p>
-          <h1 className="mx-auto mt-4 max-w-4xl text-[clamp(3rem,8vw,6.2rem)] font-normal leading-[.96] tracking-[-.05em] text-[#202124]">
-            Build what matters.
-            <span className="block text-[#5f6368]">Learn with people who do.</span>
-          </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-[#5f6368] sm:text-lg sm:leading-8">
-            Explore the teams behind GDG on Campus VIT Chennai, understand what each one works on, and choose where you want to contribute.
-          </p>
-
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/departments" className="button-primary px-6">
-              Explore teams <ArrowRight size={17} aria-hidden="true" />
-            </Link>
-            <a
-              href="https://docs.google.com/document/d/1nkCCHtfCWqLvFjlYgb5EmNG9xmhrsuUEDxEluKtO_Ug/edit?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-              className="button-secondary px-6"
-            >
-              Recruitment FAQs
+          <div className="hero-standfirst">
+            <h2>Learn with people who do.</h2>
+            <span className="hero-rule" aria-hidden="true" />
+            <p>Explore the teams behind GDG on Campus VIT Chennai, understand what each one works on, and choose where you want to contribute.</p>
+            <a className="hero-how-link" href="https://docs.google.com/document/d/1nkCCHtfCWqLvFjlYgb5EmNG9xmhrsuUEDxEluKtO_Ug/edit?usp=sharing" target="_blank" rel="noreferrer">
+              How recruitment works <ArrowOutward size={17} />
             </a>
           </div>
-
-          <div className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#f1f3f4] px-4 py-2 text-sm text-[#5f6368]">
-            <span className={`h-2 w-2 rounded-full ${open ? "bg-[#34a853]" : "bg-[#80868b]"}`} aria-hidden="true" />
-            {open ? "Applications are open" : "Recruitment is currently closed"}
-          </div>
+          <div className="hero-color-key" aria-hidden="true"><span /><span /><span /><span /></div>
         </div>
-
-        <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {principles.map(({ title, text, Icon, color }) => (
-            <article key={title} className="rounded-[18px] border border-[#dadce0] bg-white p-6 transition-shadow hover:shadow-[0_1px_2px_rgba(60,64,67,.08),0_2px_8px_rgba(60,64,67,.08)]">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ backgroundColor: `${color}14`, color }}>
-                <Icon size={19} aria-hidden="true" />
-              </div>
-              <h2 className="mt-5 text-[15px] font-semibold text-[#202124]">{title}</h2>
-              <p className="mt-2 text-sm leading-6 text-[#5f6368]">{text}</p>
+        <aside className="hero-action-plate">
+          <span className="hero-action-number">01</span>
+          <h2>Explore<br />teams.</h2>
+          <div className="hero-actions">
+            <Link href="/departments" className="hero-action-link primary">Explore teams <ArrowForward size={20} /></Link>
+            <a href="https://docs.google.com/document/d/1nkCCHtfCWqLvFjlYgb5EmNG9xmhrsuUEDxEluKtO_Ug/edit?usp=sharing" target="_blank" rel="noreferrer" className="hero-action-link">
+              Recruitment FAQs <ArrowOutward size={19} />
+            </a>
+          </div>
+        </aside>
+      </div>
+      <div className="principles-band">
+        <div className="principles-rail" aria-hidden="true">{open ? "Applications open" : "Recruitment archive"}</div>
+        <div className="principles-list">
+          {principles.map(([index, title, text]) => (
+            <article className="principle-item" key={title}>
+              <span className="principle-index">{index}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
             </article>
           ))}
         </div>

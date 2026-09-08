@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChevronDown, LogOut, ShieldCheck } from "lucide-react";
+import { ArrowDropDown } from "@material-symbols-svg/react/icons/arrow-drop-down";
+import { Logout } from "@material-symbols-svg/react/icons/logout";
+import { VerifiedUser } from "@material-symbols-svg/react/icons/verified-user";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +38,7 @@ export default function UserButton({ user }) {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex max-w-[250px] items-center gap-2 rounded-full border border-[#dadce0] bg-white py-1.5 pl-1.5 pr-3 text-left text-sm text-[#202124] transition-colors hover:bg-[#f8f9fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a73e8]"
+          className="inline-flex max-w-[250px] items-center gap-2 border border-[#111] bg-white py-1.5 pl-1.5 pr-3 text-left text-sm text-[#202124] transition-colors hover:bg-[#fbbc04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a73e8]"
           aria-label={`Open account menu for ${displayName}`}
         >
           <Avatar className="h-8 w-8 border border-[#e8eaed]">
@@ -47,7 +49,7 @@ export default function UserButton({ user }) {
             <span className="block truncate font-medium">{displayName}</span>
             <span className="block truncate text-[11px] text-[#80868b]">{user.email}</span>
           </span>
-          <ChevronDown className="h-4 w-4 shrink-0 text-[#80868b]" aria-hidden="true" />
+          <ArrowDropDown className="h-4 w-4 shrink-0" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 border-[#dadce0] bg-white text-[#202124] shadow-lg">
@@ -59,7 +61,7 @@ export default function UserButton({ user }) {
           <>
             <DropdownMenuSeparator className="bg-[#e8eaed]" />
             <div className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#188038]">
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              <VerifiedUser className="h-4 w-4" aria-hidden="true" />
               Administrator access
             </div>
           </>
@@ -69,7 +71,7 @@ export default function UserButton({ user }) {
           onSelect={() => router.push("/auth/signout")}
           className="cursor-pointer gap-2 px-3 py-2.5 focus:bg-[#f1f3f4] focus:text-[#202124]"
         >
-          <LogOut className="h-4 w-4" aria-hidden="true" />
+          <Logout className="h-4 w-4" aria-hidden="true" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

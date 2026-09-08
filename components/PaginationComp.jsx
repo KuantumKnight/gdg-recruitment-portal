@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft } from "@material-symbols-svg/react/icons/chevron-left";
+import { ChevronRight } from "@material-symbols-svg/react/icons/chevron-right";
 
 export default function PaginationComp({
   pageIndex,

@@ -20,7 +20,7 @@ export default function DialogComp({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[#dadce0] bg-white text-[#202124] shadow-xl sm:max-w-2xl">
+      <DialogContent className="rounded-none border-[#111] bg-white text-[#202124] shadow-xl sm:max-w-2xl">
         <DialogHeader>
           <p className="eyebrow mb-1">Application review</p>
           <DialogTitle className="text-2xl font-medium tracking-[-.03em] text-[#202124]">
@@ -33,7 +33,7 @@ export default function DialogComp({
 
         {applicant && (
           <>
-            <dl className="grid gap-4 rounded-2xl border border-[#e8eaed] bg-[#f8f9fa] p-4 text-sm sm:grid-cols-2">
+            <dl className="grid gap-4 border border-[#111] bg-[#f8f9fa] p-4 text-sm sm:grid-cols-2">
               {[
                 ["Email", applicant.Email],
                 ["Registration", applicant.RegistrationNumber],

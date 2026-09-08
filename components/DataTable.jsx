@@ -1,16 +1,14 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import {
-  ArrowDown,
-  ArrowUp,
-  Download,
-  Search,
-  Users,
-  CheckCircle2,
-  ListFilter,
-  X,
-} from "lucide-react";
+import { ArrowDownward } from "@material-symbols-svg/react/icons/arrow-downward";
+import { ArrowUpward } from "@material-symbols-svg/react/icons/arrow-upward";
+import { Close } from "@material-symbols-svg/react/icons/close";
+import { Download } from "@material-symbols-svg/react/icons/download";
+import { FilterAlt } from "@material-symbols-svg/react/icons/filter-alt";
+import { Group } from "@material-symbols-svg/react/icons/group";
+import { Search } from "@material-symbols-svg/react/icons/search";
+import { TaskAlt } from "@material-symbols-svg/react/icons/task-alt";
 import { toast } from "sonner";
 import {
   applicantId,
@@ -24,7 +22,7 @@ import FilterDepartment from "./FilterDepartment";
 import FilterShortlisted from "./FilterShortlisted";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#dadce0] bg-white px-3 text-sm text-[#202124] focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]";
+  "h-11 w-full border border-[#111] bg-white px-3 text-sm text-[#202124] focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]";
 
 export default function DataTable({ data, setData, hasMore }) {
   const [query, setQuery] = useState("");
@@ -198,35 +196,35 @@ export default function DataTable({ data, setData, hasMore }) {
   }
 
   const stats = [
-    { label: "Applications loaded", value: data.length, Icon: Users },
+    { label: "Applications loaded", value: data.length, Icon: Group },
     {
       label: "Shortlisted in loaded batch",
       value: data.filter((item) => item.shortlisted).length,
-      Icon: CheckCircle2,
+      Icon: TaskAlt,
     },
-    { label: "Matching your filters", value: filtered.length, Icon: ListFilter },
+    { label: "Matching your filters", value: filtered.length, Icon: FilterAlt },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
+    <div className="admin-data">
+      <div className="admin-stats">
         {stats.map(({ label, value, Icon }) => (
-          <div key={label} className="panel flex items-start justify-between p-6">
+          <div key={label} className="admin-stat">
             <div>
-              <p className="text-xs text-[#5f6368]">{label}</p>
-              <p className="mt-3 text-4xl font-medium tracking-tight text-[#202124]">
+              <p className="admin-stat-label">{label}</p>
+              <p className="admin-stat-value">
                 {value.toString().padStart(2, "0")}
               </p>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8f0fe] text-[#1a73e8]">
+            <div className="admin-stat-icon">
               <Icon size={19} />
             </div>
           </div>
         ))}
       </div>
 
-      <div className="panel overflow-hidden">
-        <div className="border-b border-[#e8eaed] p-5 sm:p-6">
+      <div className="admin-inbox">
+        <div className="admin-inbox-toolbar">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-[#202124]">Application inbox</h2>
@@ -245,7 +243,7 @@ export default function DataTable({ data, setData, hasMore }) {
             </button>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
+          <div className="admin-filter-grid">
             <label className="relative">
               <span className="sr-only">Search applications</span>
               <Search className="absolute left-3 top-3.5 text-[#80868b]" size={16} />
@@ -287,7 +285,7 @@ export default function DataTable({ data, setData, hasMore }) {
             </span>
             <MailComposer recipients={selectedApplicants} handleRowSelection={sendMail} />
             <button className="button-secondary" onClick={() => setSelected(new Set())}>
-              <X size={14} /> Clear selection
+              <Close size={14} /> Clear selection
             </button>
           </div>
         )}
@@ -346,9 +344,9 @@ export default function DataTable({ data, setData, hasMore }) {
                       {label}
                       {sort.key === key &&
                         (sort.direction === 1 ? (
-                          <ArrowUp size={12} />
+                          <ArrowUpward size={12} />
                         ) : (
-                          <ArrowDown size={12} />
+                          <ArrowDownward size={12} />
                         ))}
                     </button>
                   </th>
@@ -394,7 +392,7 @@ export default function DataTable({ data, setData, hasMore }) {
                         aria-label={`${applicant.shortlisted ? "Remove" : "Add"} ${applicant.Name} ${applicant.shortlisted ? "from" : "to"} shortlist`}
                         disabled={pending.has(id)}
                         onClick={() => handleShortlist(applicant)}
-                        className={`rounded-full border px-3 py-2 text-xs font-medium ${
+                        className={`border px-3 py-2 text-xs font-medium ${
                           applicant.shortlisted
                             ? "border-[#a8dab5] bg-[#e6f4ea] text-[#137333]"
                             : "border-[#dadce0] bg-white text-[#5f6368]"
@@ -425,7 +423,7 @@ export default function DataTable({ data, setData, hasMore }) {
 
         {!filtered.length && (
           <div className="px-6 py-16 text-center">
-            <Users className="mx-auto mb-4 text-[#9aa0a6]" size={30} />
+            <Group className="mx-auto mb-4 text-[#9aa0a6]" size={30} />
             <h3 className="font-medium text-[#202124]">
               {data.length ? "No matching applications" : "A new team starts here"}
             </h3>
@@ -446,7 +444,7 @@ export default function DataTable({ data, setData, hasMore }) {
                 setPageSize(Number(event.target.value));
                 setPageIndex(0);
               }}
-              className="rounded-lg border border-[#dadce0] bg-white p-2 text-[#202124] focus:border-[#1a73e8] focus:outline-none"
+              className="border border-[#111] bg-white p-2 text-[#202124] focus:border-[#1a73e8] focus:outline-none"
             >
               {[10, 25, 50].map((size) => (
                 <option key={size}>{size}</option>
