@@ -1,381 +1,251 @@
-# GDG Recruitment Portal
+# GDG on Campus · VIT Chennai
 
-A production-oriented recruitment portal for **Google Developer Groups on Campus · VIT Chennai**.
+## Recruitment Portal
 
-The project started as a partially complete recruitment site and has since been hardened across authentication, data integrity, admin access, UX, testing, and deployment readiness.
-<img width="1280" height="704" alt="image" src="https://github.com/user-attachments/assets/8759fba5-f224-4b88-991a-e527fae9b2fc" />
+> A focused, secure application platform for discovering departments, collecting candidate responses, and running the review process from one calm admin workspace.
 
-## Live deployment
+<img width="1280" height="704" alt="GDG recruitment portal preview" src="https://github.com/user-attachments/assets/8759fba5-f224-4b88-991a-e527fae9b2fc" />
 
-**https://gdg-recruitment-portal-omega.vercel.app**
+[![Live deployment](https://img.shields.io/badge/Live%20deployment-Visit%20site-1a73e8?style=for-the-badge)](https://gdg-recruitment-portal-omega.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-Firestore-ffca28?style=flat-square&logo=firebase&logoColor=111)](https://firebase.google.com/docs/firestore)
+[![Tests](https://img.shields.io/badge/verification-Vitest%20%2B%20Playwright-16a34a?style=flat-square)](#verification)
 
-> The repository code is deployment-ready from a CI perspective. Production behavior still depends on correctly configured Google OAuth, Firebase, Better Auth, and optional SMTP environment variables.
+The GDG on Campus VIT Chennai recruitment portal gives applicants a clear path from **“I want to join”** to a complete, department-specific application. The core team gets the other half: protected applicant data, bounded review tools, shortlisting, CSV export, and an admin-only email workflow.
 
-## Current status
+This is not just a form with a database behind it. The project is built around the uncomfortable parts of recruitment software: identity, authorization, duplicate submissions, race conditions, data integrity, privacy, and safe operational tooling.
 
-| Area | Status |
+## The experience
+
+### For applicants
+
+- Browse the full department directory with search and category grouping.
+- Sign in with a verified Google account from `@vitstudent.ac.in`.
+- Select up to two departments.
+- Answer questions tailored to each selected department.
+- Recover an in-progress draft locally and retry safely after a failed request.
+- See clear recruitment-open, recruitment-closed, loading, error, and not-found states.
+
+### For the core team
+
+- Open a protected admin workspace with paginated applicant data.
+- Filter by department, shortlist status, and search terms.
+- Inspect structured applicant responses.
+- Shortlist or unshortlist candidates through guarded server routes.
+- Export normalized CSV data with spreadsheet-formula injection protection.
+- Compose email to selected applicants without trusting browser-supplied recipients or HTML.
+
+## Why this project is interesting
+
+The strongest parts of the portal are the invisible ones:
+
+| Problem | Engineering response |
 | --- | --- |
-| Public recruitment UI | Complete |
-| Google-only authentication | Complete |
-| `@vitstudent.ac.in` enforcement | Complete |
-| Server-side authorization | Complete |
-| Application submission flow | Complete |
-| Atomic application limits | Complete |
-| Draft recovery | Complete |
-| Admin applicant workspace | Complete |
-| Shortlisting workflow | Complete |
-| Admin email workflow | Complete in code |
-| CSV export hardening | Complete |
-| Responsive / Material-style redesign | Complete |
-| Unit / integration tests | Passing |
-| Production build | Passing |
-| Playwright browser tests | Passing |
-| Production OAuth / Firebase / SMTP verification | External configuration / final validation required |
+| A user can fake frontend state | Authorization and institutional identity are checked on the server. |
+| Two concurrent submissions can bypass a limit | Firestore transactionally checks and persists application state. |
+| A request can contain fields the UI never renders | Input is parsed through an allowlisted Zod contract. |
+| Applicant PII should not be shipped to unauthorized browsers | Admin access is enforced before private data is loaded. |
+| CSV cells can become spreadsheet formulas | Dangerous control-leading values are neutralized before export. |
+| Mail content can become an injection vector | Plain text is escaped before HTML rendering and SMTP calls are bounded. |
+| A retry should not create a second application | Existing application identity and successful-submission state are preserved. |
 
-## What has been completed
+## Product flow
 
-### 1. Google-only VIT student authentication
-
-Authentication is intentionally restricted to Google OAuth.
-
-- Removed email/password sign-in from the user-facing flow.
-- Google is the only supported login provider.
-- Only accounts ending exactly in `@vitstudent.ac.in` are accepted.
-- Personal Gmail accounts are rejected.
-- `@vit.ac.in` and other domains are rejected.
-- Lookalike domains such as `@vitstudent.ac.in.attacker.test` are rejected.
-- The institutional email must be reported as verified.
-- Google receives an `hd=vitstudent.ac.in` hosted-domain hint for the account chooser.
-- Protected server routes re-check the authenticated institutional identity instead of trusting the frontend.
-
-The domain rule is covered by automated tests.
-
-### 2. Application integrity and ownership
-
-The application path was rebuilt around a strict server-side contract.
-
-- Applicant identity comes from the authenticated session rather than request data.
-- Unknown and malformed fields are rejected.
-- Request sizes are bounded.
-- Department/question IDs are stable and decoupled from display labels.
-- Gender, year, motivation, and question responses are preserved correctly.
-- Registration-number application indexes are bound to the applicant account.
-- Existing registration ownership cannot be silently mixed across different users.
-- Legacy records are handled defensively.
-
-### 3. Atomic application limits
-
-Application-limit checks and writes now happen transactionally.
-
-This prevents race conditions where concurrent requests could previously bypass the maximum-department rule.
-
-- Limit check and persistence happen in one Firestore transaction.
-- Duplicate retries return the existing application instead of creating another record.
-- Previously saved answers are preserved on retry.
-
-### 4. Server-side admin authorization
-
-Admin protection is enforced before private applicant data is loaded.
-
-- Admin pages require a valid authenticated session on the server.
-- Admin APIs independently enforce authorization.
-- Banned or invalid users are rejected.
-- Applicant listing is paginated and bounded rather than loading the full collection immediately.
-- Shortlist mutations are protected server operations.
-
-### 5. Firestore security model
-
-The browser does not need direct database privileges for application or admin workflows.
-
-- Sensitive database operations use Firebase Admin on the server.
-- Direct client Firestore access is denied by repository rules.
-- Application policy is enforced in server handlers rather than trusting browser code.
-
-### 6. Reliable applicant UX
-
-The application experience was rebuilt for clarity and recovery.
-
-- Responsive department discovery and filtering.
-- Clear closed/open recruitment state.
-- Department-selection summary.
-- Improved form states and validation feedback.
-- Local draft recovery scoped to user and department selection.
-- Successful submissions are tracked independently so retries only target pending work.
-- Stale status requests are aborted.
-- Error, loading, not-found, and sign-out states are now consistent.
-
-### 7. Professional frontend redesign
-
-The active product surfaces now use a restrained Google / Material-inspired visual language.
-
-- Cleaner typography and spacing.
-- Neutral surfaces and borders.
-- Google blue primary actions.
-- Restrained use of Google brand colors.
-- Simplified navigation hierarchy.
-- Updated sign-in experience with the Google mark and a single OAuth action.
-- Responsive public, auth, and admin layouts.
-- Reduced visual clutter and removed unreachable legacy UI wrappers.
-
-### 8. Admin review workflow
-
-The admin workspace now supports a bounded review workflow rather than an unstructured full-data dump.
-
-- Paginated applicant loading.
-- Filtering and sorting from a canonical client state.
-- Shortlist status updates.
-- Applicant response inspection.
-- Safer CSV export.
-- Admin-only email composition.
-
-### 9. Safer CSV export
-
-CSV output is normalized before download.
-
-- Historical response shapes are converted into readable values.
-- `false` and `0` are preserved.
-- Columns use an explicit allowlist.
-- Spreadsheet formula/control-leading cells are neutralized.
-- Quoting and UTF-8 output are handled explicitly.
-
-### 10. Protected admin email workflow
-
-The email route was redesigned as a privileged server operation.
-
-- Requires fresh admin authorization.
-- Browser sends applicant IDs, not arbitrary destination email addresses.
-- Recipient addresses are resolved from Firestore on the server.
-- Request body and recipient counts are bounded.
-- Subject/message inputs are validated.
-- Plain text is escaped before HTML rendering.
-- SMTP timeouts are bounded.
-- Provider rejection / partial acceptance is surfaced rather than silently treated as success.
-
-No exactly-once delivery guarantee is claimed; provider acceptance is not the same as inbox delivery.
-
-### 11. Codebase cleanup
-
-A large amount of unfinished or unreachable code has been removed.
-
-Examples include:
-
-- unfinished `/development` route
-- obsolete Pages Router `_error` artifact
-- unused duplicate application-read endpoints
-- old department wrappers
-- old animation / carousel / magic-card wrappers
-- unused theme/sign-in wrappers
-- placeholder mail template
-- obsolete countdown component
-
-The active route graph is now much easier to explain and maintain.
-
-### 12. Tooling and verification
-
-The repository now has a repeatable verification pipeline.
-
-Current CI runs:
-
-```bash
-bun install --frozen-lockfile
-bun run lint
-bun run typecheck
-bun run test
-bun run build
-bun run test:e2e
+```text
+Landing page
+    ↓
+Department directory ──→ choose 1–2 departments
+    ↓
+Google / VIT identity check
+    ↓
+Department-specific application forms
+    ↓
+Validated, server-owned Firestore write
+    ↓
+Admin review → filter → inspect → shortlist → email
 ```
 
-Latest verified `dev` state before this README update passed:
+## Stack
 
-- ESLint
-- TypeScript typecheck
-- **59 Vitest tests**
-- Next.js production build
-- Playwright browser tests on desktop/mobile coverage
+| Layer | Technology |
+| --- | --- |
+| Framework | Next.js 15 · App Router · React 18 |
+| Authentication | Better Auth · Google OAuth · verified institutional domain policy |
+| Data | Firestore through `firebase-admin` on the server |
+| Validation | Zod · React Hook Form |
+| UI | Tailwind CSS · Radix UI primitives · Material / Google-inspired visual system |
+| Email | Nodemailer with protected admin delivery |
+| Testing | Vitest · Playwright |
+| Tooling | Bun · TypeScript checks · ESLint |
 
-The browser suite covers public navigation, recruitment state, Google-only sign-in UI, callback preservation, and mobile overflow/navigation checks.
-
-## Tech stack
-
-- **Next.js 15.5.25** — App Router
-- **React 18**
-- **Tailwind CSS**
-- **Better Auth 1.6.25**
-- **better-auth-firestore**
-- **Firebase / Firebase Admin / Firestore**
-- **Zod**
-- **React Hook Form**
-- **Nodemailer**
-- **Vitest**
-- **Playwright**
-- **Bun**
-
-## Main routes
+## Routes at a glance
 
 ```text
 /                         Landing page
-/departments              Department discovery
-/join/[...joinIds]        Application flow
-/auth/signin              Google-only sign in
-/auth/signout             Sign out
-/admin                    Protected admin workspace
+/departments              Department directory and selection
+/join/[...joinIds]        Department-specific application flow
+/auth/signin              Google-only sign-in
+/auth/signout             Sign-out flow
+/admin                    Protected applicant review workspace
 ```
 
-Important API routes include application submission/status, protected applicant listing, shortlisting, authentication, and admin email delivery.
+The main API surface is similarly scoped:
 
-## Local development
+```text
+/api/auth/[...all]        Better Auth handlers
+/api/check-applications   Current user's submission status
+/api/submit-form          Validated application submission
+/api/admin/applicants     Paginated admin applicant listing
+/api/shortlist/[id]       Protected shortlist mutation
+/api/send-email           Protected admin email delivery
+```
 
-### Requirements
+## Quick start
+
+### Prerequisites
 
 - Node.js 22+
-- Bun
-- Firebase / Firestore configuration
-- Google OAuth credentials for authentication
+- [Bun](https://bun.sh/)
+- Java 21+ for the Firebase emulator
+- Google OAuth credentials for a real sign-in flow
 
-### Install
+### 1. Install dependencies
 
 ```bash
 bun install
 ```
 
-### Environment
-
-Copy the example file:
+### 2. Configure the environment
 
 ```bash
 cp .env.example .env.local
 ```
 
-At minimum, configure the services you intend to use.
-
-Important variables include:
+At minimum, set a strong auth secret and the Firebase / Google values required by the flow you want to exercise:
 
 ```env
-BETTER_AUTH_SECRET=
+BETTER_AUTH_SECRET=replace-with-a-long-random-secret
 BETTER_AUTH_URL=http://localhost:3000
 
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-
-FIREBASE_PROJECT_ID=
+FIREBASE_PROJECT_ID=demo-gdg-recruitment
 FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
 
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-
-# Optional admin mail delivery
-EMAIL_USERNAME=
-EMAIL_PASSWORD=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 ```
 
-Google Cloud should include the local callback:
+For local Firestore, use the emulator instead of production credentials:
 
-```text
-http://localhost:3000/api/auth/callback/google
+```env
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
 ```
 
-For production, also add:
+For Gmail-backed admin email, also configure `EMAIL_USERNAME` and `EMAIL_PASSWORD` using an app password. Never commit `.env.local` or service-account credentials.
 
-```text
-https://<production-domain>/api/auth/callback/google
+### 3. Start Firestore
+
+In terminal 1:
+
+```bash
+bunx firebase emulators:start --only firestore --project demo-gdg-recruitment
 ```
 
-For the current Vercel deployment, the matching callback is:
+The Firestore emulator runs on `127.0.0.1:8080`. Its UI is available at `http://127.0.0.1:4000`.
 
-```text
-https://gdg-recruitment-portal-omega.vercel.app/api/auth/callback/google
-```
+### 4. Start the app
 
-### Run
+In terminal 2:
 
 ```bash
 bun run dev
 ```
 
-Then open:
+Open [http://localhost:3000](http://localhost:3000).
+
+Google OAuth must include this callback URL:
 
 ```text
-http://localhost:3000
+http://localhost:3000/api/auth/callback/google
 ```
 
-## Verification commands
+The production deployment uses:
+
+```text
+https://gdg-recruitment-portal-omega.vercel.app/api/auth/callback/google
+```
+
+## Verification
+
+Run the same checks used by CI:
 
 ```bash
 bun run lint
 bun run typecheck
 bun run test
 bun run build
+bunx playwright install --with-deps chromium
 bun run test:e2e
 ```
 
-For backend tests that exercise Firestore behavior, use the repository's Firestore emulator setup / CI workflow rather than a production database.
+The test suite covers authentication policy, application validation, ownership, duplicate and concurrent submissions, admin authorization, shortlist behavior, email handling, CSV safety, legacy response shapes, public navigation, recruitment state, and mobile browser behavior.
 
-## What is still remaining
+## Security model
 
-The major application code is implemented and CI-green, but the following items still require explicit production or organizer-side work.
+The portal uses a server-trust model:
 
-### Production configuration and validation
+- The authenticated user is the source of applicant identity; request-body identity is ignored.
+- Google is the only supported sign-in provider.
+- Only verified `@vitstudent.ac.in` accounts are accepted.
+- Admin pages and admin APIs independently enforce authorization.
+- Sensitive Firestore work happens through Firebase Admin on the server.
+- Browser clients do not receive direct database privileges for application or admin workflows.
+- Application writes are validated, bounded, and allowlisted.
+- Department limits are enforced inside a Firestore transaction.
+- Email recipients are resolved server-side from applicant IDs.
+- Plain-text mail is escaped before HTML rendering.
+- Production secrets belong in deployment secret management, never in Git.
 
-- Configure a strong real `BETTER_AUTH_SECRET` in the deployment environment.
-- Configure the real Google OAuth client ID/secret.
-- Add the production OAuth callback URL in Google Cloud Console.
-- Verify an actual `@vitstudent.ac.in` Google login end-to-end on the deployed site.
-- Verify that personal Gmail and non-student VIT accounts are rejected in the live environment.
-- Configure production Firebase Admin credentials.
-- Deploy and verify the intended Firestore rules in the actual Firebase project.
-- Run controlled production/emulator contention checks for transactional application limits.
+## Deployment notes
 
-### Email delivery
+The project is prepared for a Vercel deployment, but production readiness still depends on external configuration:
 
-- Configure the real SMTP/Gmail app-password credentials if admin email is required.
-- Run a controlled delivery test to test accounts.
-- Inspect provider results before manually retrying uncertain/partial deliveries.
-- A durable queue / exactly-once email system would be a future enhancement if mail becomes operationally important.
+1. Add the production `BETTER_AUTH_SECRET`.
+2. Configure the Google OAuth client and production callback URL.
+3. Configure Firebase Admin credentials and deploy the intended Firestore rules.
+4. Confirm the recruitment deadline through `NEXT_PUBLIC_RECRUITMENT_DEADLINE`.
+5. Configure SMTP / Gmail app-password credentials if admin email is needed.
+6. Run a real applicant flow and a real admin flow against the deployed environment.
 
-### Product / content review
+`NEXT_PUBLIC_*` values are embedded during the build, so rebuild after changing them.
 
-- Organizer review of replacement questionnaire wording is still required where original source text was corrupted.
-- Confirm the recruitment deadline/configuration before reopening future recruitment rounds.
-- Define retention/privacy expectations for browser-local application drafts.
+## Known gaps
 
-### Final production quality checks
+Keeping the gaps visible is part of the project:
 
-- Run a real authenticated applicant flow against the deployed environment.
-- Run a real authenticated admin flow against the deployed environment.
-- Perform a keyboard/accessibility audit and Lighthouse/Web Vitals measurement on production.
-- Review remaining dependency advisories before long-term production use; avoid blind major-version upgrades without regression testing.
+- Production OAuth, Firebase, and SMTP still require organizer-side configuration and live verification.
+- Email provider acceptance is not the same as inbox delivery; there is no exactly-once delivery guarantee.
+- Applicant draft data is stored in browser-local storage, so retention and privacy expectations should be documented for each recruitment round.
+- Questionnaire wording should receive an organizer review before a new round opens.
+- Accessibility and Lighthouse / Web Vitals checks should be run against the final production deployment.
+- Dependency advisories should be reviewed before long-term operation.
 
-### Repository hygiene
+## Project notes
 
-After the active `dev` work is merged:
+The repository contains deeper engineering context when you want to go below the surface:
 
-- keep `main` protected
-- require CI checks before future merges
-- delete stale temporary branches that are no longer needed
-- continue feature work through short-lived branches / pull requests
+- [`WORK.md`](./WORK.md) — issue-by-issue engineering audit and rationale
+- [`ROUND2_IMPROVEMENTS.md`](./ROUND2_IMPROVEMENTS.md) — detailed implementation checklist
+- [`BACKEND_NOTES.md`](./BACKEND_NOTES.md) — backend architecture and trust boundaries
+- [`FRONTEND_NOTES.md`](./FRONTEND_NOTES.md) — frontend implementation notes
+- [`ADMIN_NOTES.md`](./ADMIN_NOTES.md) — admin workflow notes
+- [`INTERVIEW_NOTES.md`](./INTERVIEW_NOTES.md) — decisions explained in interview-ready language
+- [`design-qa.md`](./design-qa.md) — visual QA notes
 
-## Security notes
+## Contributing
 
-This project deliberately follows a server-trust model:
+Keep changes small, tested, and easy to review. Before opening a PR, run the full verification block above and update the relevant project notes when behavior or security assumptions change.
 
-- frontend authorization is never treated as sufficient security
-- authenticated identity is derived server-side
-- institutional email policy is rechecked for protected operations
-- database writes are validated and allowlisted
-- privileged admin/email actions have independent server guards
-- application limits are enforced transactionally
-- direct browser database access is not required
+---
 
-Do not commit production secrets to the repository. Use Vercel/Firebase/Google Cloud environment and secret-management facilities.
-
-## Project documentation
-
-Additional engineering notes remain in the repository:
-
-- `ROUND2_IMPROVEMENTS.md` — detailed issue-by-issue engineering audit
-- `BACKEND_NOTES.md` — backend architecture and trust-boundary notes
-- `FRONTEND_NOTES.md` — frontend implementation notes
-- `ADMIN_NOTES.md` — admin workflow notes
-- `INTERVIEW_NOTES.md` — reasoning and interview explanations
-
-Some older notes describe the codebase at earlier checkpoints. **This README reflects the current intended architecture and should be treated as the high-level source of truth.**
+Built for **GDG on Campus · VIT Chennai** with a bias toward clarity, safe defaults, and fewer surprises in production.
