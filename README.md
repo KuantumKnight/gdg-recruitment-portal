@@ -3,6 +3,7 @@
 A production-oriented recruitment portal for **Google Developer Groups on Campus · VIT Chennai**.
 
 The project started as a partially complete recruitment site and has since been hardened across authentication, data integrity, admin access, UX, testing, and deployment readiness.
+<img width="1280" height="704" alt="image" src="https://github.com/user-attachments/assets/8759fba5-f224-4b88-991a-e527fae9b2fc" />
 
 ## Live deployment
 
