@@ -35,6 +35,12 @@ This is not just a form with a database behind it. The project is built around t
 - Export normalized CSV data with spreadsheet-formula injection protection.
 - Compose email to selected applicants without trusting browser-supplied recipients or HTML.
 
+### Admin panel preview
+
+The protected workspace is designed for fast review: load applicants, filter the current batch, inspect responses, shortlist candidates, export records, and compose email from one place.
+
+![GDG recruitment admin panel preview](./docs/admin-panel.png)
+
 ## Why this project is interesting
 
 The strongest parts of the portal are the invisible ones:
